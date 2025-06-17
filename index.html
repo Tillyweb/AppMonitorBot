@@ -173,10 +173,11 @@
                             <th class="py-2 px-4 text-left">แถว</th>
                             <th class="py-2 px-4 text-left">วันที่ (Demodate)</th>
                             <th class="py-2 px-4 text-left">ค่า (DemoUSDT)</th>
+                            <th class="py-2 px-4 text-left">ถอนUSDT</th> <!-- New header -->
                         </tr>
                     </thead>
                     <tbody id="specific-caculate-data-body" class="text-gray-700 text-xs md:text-sm font-light">
-                        <tr><td colspan="3" class="text-center py-4">กำลังโหลดข้อมูล...</td></tr>
+                        <tr><td colspan="4" class="text-center py-4">กำลังโหลดข้อมูล...</td></tr> <!-- Updated colspan -->
                     </tbody>
                 </table>
             </div>
@@ -277,7 +278,7 @@
             if (!dateString) return '';
             let date = new Date(dateString);
 
-            // Attempt to parse as YYYY-MM-DD if initial parsing failed or yielded invalid date
+            // Attempt to parse as ISO 8601 (YYYY-MM-DD) if initial parsing failed or yielded invalid date
             if (isNaN(date.getTime())) {
                 const parts = String(dateString).split('-'); // Ensure dateString is treated as string
                 if (parts.length === 3) {
@@ -343,7 +344,7 @@
             data.forEach(row => {
                 if (row['DATE']) {
                     const date = new Date(row['DATE']);
-                    // Attempt to parse as YYYY-MM-DD if it's a string
+                    // Attempt to parse as ISO 8601 (YYYY-MM-DD) if it's a string
                     if (isNaN(date.getTime())) {
                         const parts = row['DATE'].split('-');
                         if (parts.length === 3) {
@@ -463,11 +464,10 @@
             // Rows specified by the user
             // F183, H183; F214, H214; F245, H245; F275, H275; F306, H306; F336, H336; F366, H366
             const targetRows = [183, 214, 245, 275, 306, 336, 366];
-            const dateCol = 'F'; // Demodate column
-            const valueCol = 'H'; // DemoUSDT column
+            const columnsToFetch = 'F,H,I'; // Demodate (F), DemoUSDT (H), ถอนUSDT (I)
 
             // Clear previous results and show loading
-            specificCaculateDataBody.innerHTML = '<tr><td colspan="3" class="text-center py-4">กำลังโหลดข้อมูล...</td></tr>';
+            specificCaculateDataBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">กำลังโหลดข้อมูล...</td></tr>';
 
             const callbackName = 'jsonpSpecificCaculateCallback_' + Date.now();
             window[callbackName] = (response) => {
@@ -477,18 +477,20 @@
                         const tr = document.createElement('tr');
                         tr.className = 'border-b border-gray-200 hover:bg-gray-50';
                         const formattedDate = item.date ? formatDate(item.date) : '-'; // Use existing formatDate
-                        // Ensure value is formatted as a whole number
-                        const formattedValue = item.value !== null && item.value !== undefined ? Math.round(item.value).toLocaleString('th-TH', { maximumFractionDigits: 0 }) : '-';
+                        // Ensure values are formatted as a whole number
+                        const formattedDemoUSDT = item.demoUSDT !== null && item.demoUSDT !== undefined ? Math.round(item.demoUSDT).toLocaleString('th-TH', { maximumFractionDigits: 0 }) : '-';
+                        const formattedWithdrawUSDT = item.withdrawUSDT !== null && item.withdrawUSDT !== undefined ? Math.round(item.withdrawUSDT).toLocaleString('th-TH', { maximumFractionDigits: 0 }) : '-';
 
                         tr.innerHTML = `
                             <td class="py-2 px-4 text-left">${item.row}</td>
                             <td class="py-2 px-4 text-left whitespace-nowrap">${formattedDate}</td>
-                            <td class="py-2 px-4 text-left">${formattedValue}</td>
+                            <td class="py-2 px-4 text-left">${formattedDemoUSDT}</td>
+                            <td class="py-2 px-4 text-left">${formattedWithdrawUSDT}</td>
                         `;
                         specificCaculateDataBody.appendChild(tr);
                     });
                 } else {
-                    specificCaculateDataBody.innerHTML = '<tr><td colspan="3" class="text-center py-4">ไม่สามารถโหลดข้อมูลเฉพาะได้</td></tr>';
+                    specificCaculateDataBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">ไม่สามารถโหลดข้อมูลเฉพาะได้</td></tr>';
                     console.error('Error fetching specific CACULATE! data:', response.error || 'Unknown error');
                 }
                 document.body.removeChild(script);
@@ -496,10 +498,10 @@
             };
 
             const script = document.createElement('script');
-            // Pass parameters for new action
-            script.src = `${SCRIPT_URL}?action=fetchSpecificCaculateData&rows=${targetRows.join(',')}&dateColumn=${dateCol}&valueColumn=${valueCol}&callback=${callbackName}`;
+            // Pass parameters for new action, rows, and specific columns
+            script.src = `${SCRIPT_URL}?action=fetchSpecificCaculateData&rows=${targetRows.join(',')}&columns=${columnsToFetch}&callback=${callbackName}`;
             script.onerror = () => {
-                specificCaculateDataBody.innerHTML = '<tr><td colspan="3" class="text-center py-4">ข้อผิดพลาดในการเชื่อมต่อ</td></tr>';
+                specificCaculateDataBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">ข้อผิดพลาดในการเชื่อมต่อ</td></tr>';
                 console.error('Failed to connect for specific CACULATE! data.');
                 document.body.removeChild(script);
                 delete window[callbackName];
@@ -672,7 +674,7 @@
             }
         });
 
-        // Initial load logic is now handled in window.onload
+        // Initial load logic is handled in window.onload
         document.addEventListener('DOMContentLoaded', () => {
             populateDateDropdown(); // Call populateDateDropdown to set default date for input page dropdown
         });
