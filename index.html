@@ -163,7 +163,24 @@
             </button>
         </div>
 
-        <!-- Search Section for CACULATE! sheet has been removed -->
+        <!-- New Small Table Section -->
+        <div class="bg-white p-4 md:p-6 rounded-xl shadow-lg mb-6 md:mb-8">
+            <h2 class="text-xl md:text-2xl font-semibold mb-4 text-gray-700">ข้อมูลสำคัญจาก CACULATE!</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white rounded-lg">
+                    <thead>
+                        <tr class="bg-gray-100 text-left text-gray-600 uppercase text-xs md:text-sm leading-normal">
+                            <th class="py-2 px-4 text-left">แถว</th>
+                            <th class="py-2 px-4 text-left">วันที่ (Demodate)</th>
+                            <th class="py-2 px-4 text-left">ค่า (DemoUSDT)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="specific-caculate-data-body" class="text-gray-700 text-xs md:text-sm font-light">
+                        <tr><td colspan="3" class="text-center py-4">กำลังโหลดข้อมูล...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
         <!-- Section 1: Data Table (now the primary display) -->
         <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
@@ -249,7 +266,8 @@
         const monthFilterSelect = document.getElementById('month-filter');
         const applyFilterBtn = document.getElementById('apply-filter-btn');
 
-        // Search related elements removed (searchDateInput, searchCaculateBtn, searchResultDisplay)
+        // New elements for specific CACULATE! data table
+        const specificCaculateDataBody = document.getElementById('specific-caculate-data-body');
 
         let allDashboardData = []; // Global variable to store raw data for filtering
 
@@ -287,7 +305,7 @@
             return `${formattedDay}/${formattedMonth}/${buddhistYear}`;
         };
 
-        // Function to render data to table
+        // Function to render data to main table
         const renderDashboard = (data) => {
             // Clear existing table data
             dataTableBody.innerHTML = '';
@@ -440,6 +458,55 @@
             document.body.appendChild(script);
         };
 
+        // Function to fetch specific cells from CACULATE!
+        const fetchSpecificCaculateData = () => {
+            // Rows specified by the user
+            // F183, H183; F214, H214; F245, H245; F275, H275; F306, H306; F336, H336; F366, H366
+            const targetRows = [183, 214, 245, 275, 306, 336, 366];
+            const dateCol = 'F'; // Demodate column
+            const valueCol = 'H'; // DemoUSDT column
+
+            // Clear previous results and show loading
+            specificCaculateDataBody.innerHTML = '<tr><td colspan="3" class="text-center py-4">กำลังโหลดข้อมูล...</td></tr>';
+
+            const callbackName = 'jsonpSpecificCaculateCallback_' + Date.now();
+            window[callbackName] = (response) => {
+                if (response && response.data) {
+                    specificCaculateDataBody.innerHTML = ''; // Clear loading
+                    response.data.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.className = 'border-b border-gray-200 hover:bg-gray-50';
+                        const formattedDate = item.date ? formatDate(item.date) : '-'; // Use existing formatDate
+                        // Ensure value is formatted as a whole number
+                        const formattedValue = item.value !== null && item.value !== undefined ? Math.round(item.value).toLocaleString('th-TH', { maximumFractionDigits: 0 }) : '-';
+
+                        tr.innerHTML = `
+                            <td class="py-2 px-4 text-left">${item.row}</td>
+                            <td class="py-2 px-4 text-left whitespace-nowrap">${formattedDate}</td>
+                            <td class="py-2 px-4 text-left">${formattedValue}</td>
+                        `;
+                        specificCaculateDataBody.appendChild(tr);
+                    });
+                } else {
+                    specificCaculateDataBody.innerHTML = '<tr><td colspan="3" class="text-center py-4">ไม่สามารถโหลดข้อมูลเฉพาะได้</td></tr>';
+                    console.error('Error fetching specific CACULATE! data:', response.error || 'Unknown error');
+                }
+                document.body.removeChild(script);
+                delete window[callbackName];
+            };
+
+            const script = document.createElement('script');
+            // Pass parameters for new action
+            script.src = `${SCRIPT_URL}?action=fetchSpecificCaculateData&rows=${targetRows.join(',')}&dateColumn=${dateCol}&valueColumn=${valueCol}&callback=${callbackName}`;
+            script.onerror = () => {
+                specificCaculateDataBody.innerHTML = '<tr><td colspan="3" class="text-center py-4">ข้อผิดพลาดในการเชื่อมต่อ</td></tr>';
+                console.error('Failed to connect for specific CACULATE! data.');
+                document.body.removeChild(script);
+                delete window[callbackName];
+            };
+            document.body.appendChild(script);
+        };
+
 
         // Function to fetch data from Google Sheet using JSONP (for Dashboard)
         const fetchData = () => {
@@ -459,6 +526,8 @@
                     localStorage.setItem('dashboardData', JSON.stringify(allDashboardData));
                     populateMonthFilter(allDashboardData); // Populate filter with new data
                     applyFilter(); // Apply filter to render initial view (default to "all")
+                    // Also fetch specific CACULATE! data
+                    fetchSpecificCaculateData(); 
                     Swal.fire({
                         icon: 'success',
                         title: 'อัพเดทข้อมูลสำเร็จ!',
@@ -490,8 +559,6 @@
             document.body.appendChild(script);
         };
 
-        // Removed searchCaculateData function
-
         // Populate date dropdown for the entire year
         const populateDateDropdown = () => {
             const today = new Date();
@@ -513,15 +580,12 @@
             // Set default selected date to today for input page
             dateSelect.value = today.toISOString().split('T')[0];
             loadInputDataForDate(); // Load data for the default selected date
-
-            // searchDateInput has been removed, so no need to set its value
         };
 
         // Event Listeners
         updateDataBtn.addEventListener('click', fetchData);
         applyFilterBtn.addEventListener('click', applyFilter); // Add event listener for the new filter button
         dateSelect.addEventListener('change', loadInputDataForDate); // Listen for date changes on input page
-        // searchCaculateBtn.addEventListener('click', searchCaculateData); // This event listener is removed
 
         inputDataPageBtn.addEventListener('click', () => {
             dashboardPage.classList.add('hidden');
@@ -589,7 +653,7 @@
                     });
 
                     // After saving, re-fetch data to update dashboard immediately and also input fields
-                    fetchData(); // This will refresh dashboard table
+                    fetchData(); // This will refresh dashboard table and specific CACULATE! table
                     loadInputDataForDate(); // This will refresh input fields for the currently selected date
                 } else {
                     Swal.fire({
@@ -610,8 +674,7 @@
 
         // Initial load logic is now handled in window.onload
         document.addEventListener('DOMContentLoaded', () => {
-            // Initial data fetch logic is now handled in window.onload.
-            populateDateDropdown(); // Call populateDateDropdown here to set default date for input page dropdown
+            populateDateDropdown(); // Call populateDateDropdown to set default date for input page dropdown
         });
     </script>
 </body>
