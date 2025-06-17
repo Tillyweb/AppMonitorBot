@@ -3,681 +3,589 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard My BOT Trading</title>
-    <!-- Tailwind CSS CDN -->
+    <title>My Trading Ai BOT</title>
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- SweetAlert2 CDN for beautiful alerts -->
+
+    <!-- Google Fonts: Kanit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- SweetAlert2 for notifications -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Inter font from Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F8F9FA; /* Light background */
-            min-height: 100vh; /* Ensure body takes full viewport height */
-            display: flex;
-            flex-direction: column; /* Allows content to stack and push down */
-            align-items: center;
-            justify-content: flex-start; /* Align content to the top */
-            padding: 1rem; /* Consistent padding around the main content */
-            overflow: hidden; /* Hide scrollbar caused by floating emojis */
-        }
-        .soft-blue { background-color: #E0F2F7; } /* A light blue */
-        .soft-green { background-color: #E6F4EA; } /* A light green */
-        .soft-yellow { background-color: #FFFDE7; } /* A light yellow */
-
-        /* Button hover effects */
-        .btn-modern {
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-            border: none;
-            cursor: pointer; /* Add pointer cursor for better UX */
-        }
-        .btn-modern:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
-        }
-        .btn-modern::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 300%;
-            height: 300%;
-            background-color: rgba(255, 255, 255, 0.15);
-            border-radius: 50%;
-            transition: all 0.75s ease-out;
-            transform: translate(-50%, -50%) scale(0);
-            opacity: 0;
-            z-index: 0;
-        }
-        .btn-modern:hover::before {
-            transform: translate(-50%, -50%) scale(1);
-            opacity: 1;
-        }
-        .btn-modern span {
-            position: relative;
-            z-index: 1;
+            font-family: 'Kanit', sans-serif;
+            background-color: #f3f4f6; /* Light gray background */
+            color: #1f2937; /* Dark text */
+            overflow-x: hidden;
         }
 
-        /* Floating Emojis Animation */
-        @keyframes floatUp {
-            0% {
-                transform: translateY(0) rotate(0deg) scale(1);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100vh) rotate(360deg) scale(1.5);
-                opacity: 0;
-            }
-        }
-
-        .emoji-container {
+        /* --- 2D Emoji Background --- */
+        #emoji-background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            overflow: hidden; /* Keep emojis within their container */
             z-index: -1;
+            overflow: hidden;
         }
 
         .emoji {
             position: absolute;
-            font-size: 3rem; /* Larger emojis */
-            animation: floatUp linear infinite;
-            opacity: 0; /* Start hidden */
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            font-size: 2rem;
+            animation: float 20s infinite linear;
+            opacity: 0.2;
         }
 
-        /* Specific emoji animation delays and positions */
-        .emoji:nth-child(1) { animation-delay: 0s; left: 10%; animation-duration: 25s; }
-        .emoji:nth-child(2) { animation-delay: 2s; left: 20%; animation-duration: 20s; }
-        .emoji:nth-child(3) { animation-delay: 4s; left: 30%; animation-duration: 22s; }
-        .emoji:nth-child(4) { animation-delay: 6s; left: 40%; animation-duration: 28s; }
-        .emoji:nth-child(5) { animation-delay: 8s; left: 50%; animation-duration: 23s; }
-        .emoji:nth-child(6) { animation-delay: 10s; left: 60%; animation-duration: 26s; }
-        .emoji:nth-child(7) { animation-delay: 12s; left: 70%; animation-duration: 21s; }
-        .emoji:nth-child(8) { animation-delay: 14s; left: 80%; animation-duration: 24s; }
-        .emoji:nth-child(9) { animation-delay: 16s; left: 90%; animation-duration: 27s; }
-        .emoji:nth-child(10) { animation-delay: 18s; left: 5%; animation-duration: 19s; }
-        .emoji:nth-child(11) { animation-delay: 20s; left: 15%; animation-duration: 29s; }
-        .emoji:nth-child(12) { animation-delay: 22s; left: 25%; animation-duration: 20s; }
-        .emoji:nth-child(13) { animation-delay: 24s; left: 35%; animation-duration: 25s; }
-        .emoji:nth-child(14) { animation-delay: 26s; left: 45%; animation-duration: 21s; }
-        .emoji:nth-child(15) { animation-delay: 28s; left: 55%; animation-duration: 28s; }
-        .emoji:nth-child(16) { animation-delay: 30s; left: 65%; animation-duration: 23s; }
-        .emoji:nth-child(17) { animation-delay: 32s; left: 75%; animation-duration: 26s; }
-        .emoji:nth-child(18) { animation-delay: 34s; left: 85%; animation-duration: 20s; }
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); }
+            100% { transform: translateY(-10vh) rotate(360deg); }
+        }
+        /* --- End of Background --- */
+
+        .main-container {
+            position: relative;
+            z-index: 1;
+        }
+        .card {
+            background: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+        }
+        
+        /* Unified Silver/Grey Button Styles */
+        .btn {
+            @apply font-bold py-2 px-4 rounded-xl shadow-md transition-all duration-200 ease-in-out;
+            @apply transform focus:outline-none focus:ring-2 focus:ring-offset-2;
+            @apply hover:-translate-y-0.5 hover:shadow-lg; /* Hover effect */
+            @apply flex items-center justify-center gap-2; /* Ensure icon and text are aligned */
+        }
+        .btn-primary {
+             /* Darker Grey for primary actions */
+            @apply btn bg-slate-600 text-white hover:bg-slate-700 focus:ring-slate-500;
+        }
+        .btn-secondary {
+            /* Lighter Grey for secondary actions */
+            @apply btn bg-slate-300 text-slate-800 hover:bg-slate-400 focus:ring-slate-300;
+        }
+        .btn-blue {
+             /* Changed to match primary for consistency */
+            @apply btn bg-slate-600 text-white hover:bg-slate-700 focus:ring-slate-500;
+        }
+
+        input, select {
+            @apply bg-gray-50 border border-gray-300 text-gray-900 rounded-lg p-2 w-full focus:ring-purple-500 focus:border-purple-500;
+        }
+        .stat-card {
+            @apply p-4 bg-gray-50 rounded-lg text-center flex flex-col justify-center;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col items-center justify-start p-4">
+<body>
+    <div id="emoji-background"></div>
 
-    <!-- Emoji Container -->
-    <div class="emoji-container">
-        <div class="emoji" style="color: #64B5F6;">📈</div>
-        <div class="emoji" style="color: #81C784;">💰</div>
-        <div class="emoji" style="color: #FFD54F;">📊</div>
-        <div class="emoji" style="color: #4DB6AC;">🚀</div>
-        <div class="emoji" style="color: #7986CB;">💸</div>
-        <div class="emoji" style="color: #FF8A65;">💡</div>
-        <div class="emoji" style="color: #A1887F;">💎</div>
-        <div class="emoji" style="color: #C5E1A5;">✨</div>
-        <div class="emoji" style="color: #EF9A9A;">💹</div>
-        <div class="emoji" style="color: #B39DDB;">🍀</div>
-        <div class="emoji" style="color: #FFEB3B;">🌟</div>
-        <div class="emoji" style="color: #8BC34A;">🌱</div>
-        <div class="emoji" style="color: #FF6F61;">💖</div>
-        <div class="emoji" style="color: #A7FFEB;">🎉</div>
-        <div class="emoji" style="color: #D1C4E9;">🔔</div>
-        <div class="emoji" style="color: #FFCC80;">📈</div>
-        <div class="emoji" style="color: #8D6E63;">💱</div>
-        <div class="emoji" style="color: #C0CA33;">👑</div>
-    </div>
+    <div class="main-container container mx-auto p-4 min-h-screen flex flex-col items-center justify-center">
 
-    <div id="dashboard-page" class="soft-blue rounded-xl shadow-lg p-4 md:p-8 w-full max-w-5xl transition-all duration-300">
-        <h1 class="text-3xl md:text-4xl font-bold text-center mb-6 md:mb-8 text-gray-800">Dashboard My BOT Trading</h1>
+        <!-- Dashboard View -->
+        <div id="dashboard-view" class="w-full max-w-5xl">
+            <header class="text-center mb-8">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800">
+                    <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-500 to-pink-500">My Trading Ai BOT</span> 🤖
+                </h1>
+                <p class="text-gray-500 mt-2">แดชบอร์ดวิเคราะห์ผลการเทรด</p>
+            </header>
 
-        <div class="flex flex-col md:flex-row items-center justify-center mb-6 md:mb-8 gap-4">
-            <button id="update-data-btn" class="btn-modern bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-4 focus:ring-blue-300 w-full md:w-auto">
-                <span>อัพเดทข้อมูล</span>
-            </button>
-            <button id="input-data-page-btn" class="btn-modern bg-green-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300 w-full md:w-auto">
-                <span>Input Data</span>
-            </button>
+            <main class="card p-4 sm:p-6">
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-4 mb-6 items-end">
+                    <div class="flex-auto min-w-[120px]">
+                        <label for="year-filter" class="block text-sm font-medium text-gray-700 mb-1">ปี</label>
+                        <select id="year-filter"></select>
+                    </div>
+                    <div class="flex-auto min-w-[120px]">
+                        <label for="coin-filter" class="block text-sm font-medium text-gray-700 mb-1">เหรียญ</label>
+                        <select id="coin-filter">
+                            <option value="all">ทั้งหมด</option>
+                        </select>
+                    </div>
+                    <div class="flex-auto min-w-[120px]">
+                        <label for="month-filter" class="block text-sm font-medium text-gray-700 mb-1">เดือน</label>
+                        <select id="month-filter">
+                            <option value="all">เดือนทั้งหมด</option>
+                            <option value="1">มกราคม</option>
+                            <option value="2">กุมภาพันธ์</option>
+                            <option value="3">มีนาคม</option>
+                            <option value="4">เมษายน</option>
+                            <option value="5">พฤษภาคม</option>
+                            <option value="6">มิถุนายน</option>
+                            <option value="7">กรกฎาคม</option>
+                            <option value="8">สิงหาคม</option>
+                            <option value="9">กันยายน</option>
+                            <option value="10">ตุลาคม</option>
+                            <option value="11">พฤศจิกายน</option>
+                            <option value="12">ธันวาคม</option>
+                        </select>
+                    </div>
+                    <div class="flex-auto min-w-[150px]">
+                        <label for="chart-type-filter" class="block text-sm font-medium text-gray-700 mb-1">รูปแบบกราฟ</label>
+                        <select id="chart-type-filter">
+                            <option value="bar">กราฟแท่ง</option>
+                            <option value="line">กราฟเส้น</option>
+                            <option value="doughnut">กราฟวงแหวน (Win/Lose)</option>
+                        </select>
+                    </div>
+                    <div class="flex-shrink-0 w-full sm:w-auto mt-4 sm:mt-0">
+                        <!-- MODIFIED: Added Emoji -->
+                        <button id="add-trade-btn" class="btn-primary w-full">
+                            ➕<span>เพิ่มข้อมูล</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Statistics Display -->
+                <div id="stats-display" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 border-t border-gray-200 py-4">
+                    <div class="stat-card">
+                        <h4 class="text-sm font-medium text-gray-500">อัตราการชนะ (Win Rate)</h4>
+                        <p id="win-rate-display" class="text-2xl font-bold text-green-500">0%</p>
+                    </div>
+                    <div class="stat-card">
+                        <h4 class="text-sm font-medium text-gray-500">อัตราการแพ้ (Lose Rate)</h4>
+                        <p id="lose-rate-display" class="text-2xl font-bold text-red-500">0%</p>
+                    </div>
+                     <div class="stat-card">
+                        <h4 class="text-sm font-medium text-gray-500">จำนวนเทรดทั้งหมด</h4>
+                        <p id="total-trades-display" class="text-2xl font-bold text-gray-700">0</p>
+                    </div>
+                </div>
+
+                <!-- Forecasting Section -->
+                <div id="forecasting-section" class="border-t border-gray-200 pt-4 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 mb-3">คำนวณแนวโน้มอนาคต (Forecasting)</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+                        <div class="stat-card md:col-span-1">
+                            <h4 class="text-sm font-medium text-gray-500">เงินในประเป๋า(THB)</h4>
+                            <input type="number" id="monthly-avg-input" placeholder="0.00" class="text-center text-xl font-bold !p-0 border-0 bg-transparent w-full">
+                        </div>
+                        <div class="stat-card md:col-span-1">
+                            <h4 class="text-sm font-medium text-gray-500">จำนวนวัน</h4>
+                            <input type="number" id="days-input" min="1" placeholder="30" class="text-center text-xl font-bold !p-0 border-0 bg-transparent w-full">
+                        </div>
+                        <div class="stat-card md:col-span-2">
+                             <h4 class="text-sm font-medium text-gray-500">ผลเทรดเฉลี่ยต่อวัน (%)</h4>
+                             <p id="daily-avg-display" class="text-2xl font-bold text-blue-500">0.00%</p>
+                        </div>
+                        <div class="stat-card bg-purple-100 md:col-span-2">
+                             <h4 class="text-sm font-medium text-purple-800">ผลลัพธ์ที่คาดการณ์ (THB)</h4>
+                             <p id="forecast-result-display" class="text-2xl font-bold text-purple-600">0.00</p>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex justify-end">
+                        <!-- MODIFIED: Added Emoji -->
+                        <button id="save-forecast-btn" class="btn-blue">
+                            🧮<span>บันทึกและคำนวณแนวโน้ม</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="w-full h-80 bg-gray-50/50 rounded-lg p-4">
+                    <canvas id="tradingChart"></canvas>
+                </div>
+            </main>
         </div>
 
-        <!-- New Filter Section -->
-        <div class="bg-white p-4 md:p-6 rounded-xl shadow-lg mb-6 md:mb-8 flex flex-col md:flex-row items-center justify-center gap-4">
-            <label for="month-filter" class="block text-gray-700 text-sm font-bold">กรองข้อมูลตามเดือน:</label>
-            <select id="month-filter" class="shadow appearance-none border rounded-lg py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500 transition-colors w-full md:w-auto">
-                <option value="all">ทั้งหมด</option>
-                <!-- Months will be populated here by JavaScript -->
-            </select>
-            <button id="apply-filter-btn" class="btn-modern bg-purple-500 text-white font-semibold py-2 px-5 rounded-lg hover:bg-purple-600 focus:outline-none focus:ring-4 focus:ring-purple-300 w-full md:w-auto">
-                <span>ใช้ตัวกรอง</span>
-            </button>
+        <!-- Add Trade View -->
+        <div id="add-trade-view" class="w-full max-w-md hidden">
+             <header class="text-center mb-8">
+                <h1 class="text-4xl font-bold">
+                     <span class="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">บันทึกการเทรด</span>
+                </h1>
+            </header>
+            <form id="add-trade-form" class="card p-8 space-y-6">
+                <div>
+                    <label for="trade-date" class="block text-sm font-medium text-gray-700 mb-1">วันที่</label>
+                    <input type="date" id="trade-date" required>
+                </div>
+                <div>
+                    <label for="trade-coin" class="block text-sm font-medium text-gray-700 mb-1">เหรียญ</label>
+                    <select id="trade-coin" required>
+                        <option value="CELO">CELO</option>
+                        <option value="ENJ">ENJ</option>
+                        <option value="WLD">WLD</option>
+                        <option value="RUNE">RUNE</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="trade-result" class="block text-sm font-medium text-gray-700 mb-1">ผลการเทรด (%)</label>
+                    <input type="number" id="trade-result" step="0.01" placeholder="เช่น 15.5 (ไม่ต้องใส่ %)" required>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <!-- MODIFIED: Added Emojis -->
+                    <button type="button" id="back-to-dashboard-btn" class="btn-secondary w-full">⬅️<span>กลับหน้าหลัก</span></button>
+                    <button type="submit" class="btn-primary w-full">💾<span>บันทึกข้อมูล</span></button>
+                </div>
+            </form>
         </div>
 
-        <!-- New Small Table Section -->
-        <div class="bg-white p-4 md:p-6 rounded-xl shadow-lg mb-6 md:mb-8">
-            <h2 class="text-xl md:text-2xl font-semibold mb-4 text-gray-700">ข้อมูลสำคัญจาก CACULATE!</h2>
-            <div class="overflow-x-auto">
-                <table class="min-w-full bg-white rounded-lg">
-                    <thead>
-                        <tr class="bg-gray-100 text-left text-gray-600 uppercase text-xs md:text-sm leading-normal">
-                            <th class="py-2 px-4 text-left">แถว</th>
-                            <th class="py-2 px-4 text-left">วันที่ (Demodate)</th>
-                            <th class="py-2 px-4 text-left">ค่า (DemoUSDT)</th>
-                            <th class="py-2 px-4 text-left">ถอนUSDT</th> <!-- New header -->
-                        </tr>
-                    </thead>
-                    <tbody id="specific-caculate-data-body" class="text-gray-700 text-xs md:text-sm font-light">
-                        <tr><td colspan="4" class="text-center py-4">กำลังโหลดข้อมูล...</td></tr> <!-- Updated colspan -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Section 1: Data Table (now the primary display) -->
-        <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
-            <h2 class="text-xl md:text-2xl font-semibold mb-4 text-gray-700">ข้อมูลการเทรด (USDT Balance)</h2>
-            <div class="overflow-x-auto">
-                <table class="min-w-full bg-white rounded-lg">
-                    <thead>
-                        <tr class="bg-gray-100 text-left text-gray-600 uppercase text-xs md:text-sm leading-normal">
-                            <th class="py-2 px-4 md:py-3 md:px-6 text-left">วันที่</th>
-                            <th class="py-2 px-4 md:py-3 md:px-6 text-left">USDT Balance</th>
-                        </tr>
-                    </thead>
-                    <tbody id="data-table-body" class="text-gray-700 text-xs md:text-sm font-light">
-                        <!-- Data will be inserted here -->
-                        <tr><td colspan="2" class="text-center py-4">กำลังโหลดข้อมูล...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div id="input-page" class="soft-green rounded-xl shadow-lg p-4 md:p-8 w-full max-w-lg transition-all duration-300 hidden">
-        <h1 class="text-2xl md:text-3xl font-bold text-center mb-6 md:mb-8 text-gray-800">กรอกข้อมูลการเทรดรายวัน</h1>
-
-        <div class="bg-white p-4 md:p-6 rounded-lg shadow-md mb-8">
-            <div class="mb-4">
-                <label for="date-select" class="block text-gray-700 text-sm font-bold mb-2">เลือกวันที่:</label>
-                <select id="date-select" class="shadow appearance-none border rounded-lg w-full py-2 px-3 md:py-3 md:px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500 transition-colors">
-                    <!-- Dates will be populated by JavaScript -->
-                </select>
-            </div>
-
-            <div class="mb-4">
-                <label for="celo-input" class="block text-gray-700 text-sm font-bold mb-2">Celo (%):</label>
-                <input type="number" id="celo-input" class="shadow appearance-none border rounded-lg w-full py-2 px-3 md:py-3 md:px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500 transition-colors" placeholder="กรอกข้อมูล Celo เป็น %">
-            </div>
-
-            <div class="mb-4">
-                <label for="enj-input" class="block text-gray-700 text-sm font-bold mb-2">ENJ (%):</label>
-                <input type="number" id="enj-input" class="shadow appearance-none border rounded-lg w-full py-2 px-3 md:py-3 md:px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500 transition-colors" placeholder="กรอกข้อมูล ENJ เป็น %">
-            </div>
-
-            <div class="mb-4">
-                <label for="wld-input" class="block text-gray-700 text-sm font-bold mb-2">WLD (%):</label>
-                <input type="number" id="wld-input" class="shadow appearance-none border rounded-lg w-full py-2 px-3 md:py-3 md:px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500 transition-colors" placeholder="กรอกข้อมูล WLD เป็น %">
-            </div>
-
-            <div class="mb-6">
-                <label for="rune-input" class="block text-gray-700 text-sm font-bold mb-2">RUNE (%):</label>
-                <input type="number" id="rune-input" class="shadow appearance-none border rounded-lg w-full py-2 px-3 md:py-3 md:px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-blue-500 transition-colors" placeholder="กรอกข้อมูล RUNE เป็น %">
-            </div>
-
-            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                <button id="save-data-btn" class="btn-modern bg-yellow-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-4 focus:ring-yellow-300 w-full md:flex-1">
-                    <span>บันทึก</span>
-                </button>
-                <button id="back-to-dashboard-btn" class="btn-modern bg-gray-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-4 focus:ring-gray-300 w-full md:flex-1">
-                    <span>กลับหน้าหลัก</span>
-                </button>
-            </div>
-        </div>
     </div>
 
     <script>
-        // Google Apps Script URL (replace if you deploy your own script)
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7N_Pm56WUz7fl82yZgPwzJC4pRfN4gWGdios5A1rJ0yT31IifkhrPIp_VfXx2fJxG/exec';
+        // --- CONFIGURATION ---
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycby7N_Pm56WUz7fl82yZgPwzJC4pRfN4gWGdios5A1rJ0yT31IifkhrPIp_VfXx2fJxG/exec';
 
-        const dashboardPage = document.getElementById('dashboard-page');
-        const inputPage = document.getElementById('input-page');
-        const updateDataBtn = document.getElementById('update-data-btn');
-        const inputDataPageBtn = document.getElementById('input-data-page-btn');
+        // --- DOM ELEMENTS ---
+        const dashboardView = document.getElementById('dashboard-view');
+        const addTradeView = document.getElementById('add-trade-view');
+        const addTradeBtn = document.getElementById('add-trade-btn');
         const backToDashboardBtn = document.getElementById('back-to-dashboard-btn');
-        const saveDataBtn = document.getElementById('save-data-btn');
-        const dataTableBody = document.getElementById('data-table-body');
+        const addTradeForm = document.getElementById('add-trade-form');
         
-        const dateSelect = document.getElementById('date-select');
-        const celoInput = document.getElementById('celo-input');
-        const enjInput = document.getElementById('enj-input');
-        const wldInput = document.getElementById('wld-input');
-        const runeInput = document.getElementById('rune-input');
+        const yearFilter = document.getElementById('year-filter');
+        const coinFilter = document.getElementById('coin-filter');
+        const monthFilter = document.getElementById('month-filter');
+        const chartTypeFilter = document.getElementById('chart-type-filter');
+        
+        const chartCanvas = document.getElementById('tradingChart');
 
-        // Elements for month filter
-        const monthFilterSelect = document.getElementById('month-filter');
-        const applyFilterBtn = document.getElementById('apply-filter-btn');
+        // Stat display elements
+        const winRateDisplay = document.getElementById('win-rate-display');
+        const loseRateDisplay = document.getElementById('lose-rate-display');
+        const totalTradesDisplay = document.getElementById('total-trades-display');
 
-        // New elements for specific CACULATE! data table
-        const specificCaculateDataBody = document.getElementById('specific-caculate-data-body');
+        // Forecasting elements
+        const monthlyAvgInput = document.getElementById('monthly-avg-input');
+        const daysInput = document.getElementById('days-input');
+        const dailyAvgDisplay = document.getElementById('daily-avg-display');
+        const forecastResultDisplay = document.getElementById('forecast-result-display');
+        const saveForecastBtn = document.getElementById('save-forecast-btn');
 
-        let allDashboardData = []; // Global variable to store raw data for filtering
 
+        // --- STATE ---
+        let tradingChart;
+        let masterData = [];
 
-        // Function to format date for display (DD/MM/BBBB - Buddhist year)
-        const formatDate = (dateString) => {
-            if (!dateString) return '';
-            let date = new Date(dateString);
+        // --- 2D EMOJI BACKGROUND LOGIC ---
+        function createFloatingEmojis() {
+            const background = document.getElementById('emoji-background');
+            if (background.children.length > 0) return;
+            const emojiChars = ['📈', '📉', '💰', '🤖', '💸', '🚀', '₿', '🔥'];
+            const numEmojis = 30;
 
-            // Attempt to parse as ISO 8601 (YYYY-MM-DD) if initial parsing failed or yielded invalid date
-            if (isNaN(date.getTime())) {
-                const parts = String(dateString).split('-'); // Ensure dateString is treated as string
-                if (parts.length === 3) {
-                    // new Date(year, monthIndex, day)
-                    date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                }
+            for (let i = 0; i < numEmojis; i++) {
+                const emoji = document.createElement('span');
+                emoji.classList.add('emoji');
+                emoji.innerText = emojiChars[Math.floor(Math.random() * emojiChars.length)];
+                emoji.style.left = `${Math.random() * 100}vw`;
+                emoji.style.animationDuration = `${Math.random() * 15 + 10}s`;
+                emoji.style.animationDelay = `${Math.random() * 10}s`;
+                background.appendChild(emoji);
             }
+        }
+        
+        // --- PAGE NAVIGATION ---
+        function showDashboard() {
+            dashboardView.classList.remove('hidden');
+            addTradeView.classList.add('hidden');
+        }
 
-            if (isNaN(date.getTime())) { // If still invalid after retry
-                return dateString; // Return original string if parsing failed
-            }
+        function showAddTradeForm() {
+            dashboardView.classList.add('hidden');
+            addTradeView.classList.remove('hidden');
+            document.getElementById('trade-date').valueAsDate = new Date();
+        }
 
-            // Get Gregorian year
-            const gregorianYear = date.getFullYear();
-            // Calculate Buddhist year
-            const buddhistYear = gregorianYear + 543; // Add 543 for Thai Buddhist calendar
-
-            // Get day and month, pad with leading zero if single digit
-            const day = date.getDate();
-            const month = date.getMonth() + 1; // Month is 0-indexed, so add 1
-            const formattedMonth = month < 10 ? '0' + month : month;
-            const formattedDay = day < 10 ? '0' + day : day;
-
-            // Construct the date string manually as DD/MM/BBBB (Buddhist year)
-            return `${formattedDay}/${formattedMonth}/${buddhistYear}`;
-        };
-
-        // Function to render data to main table
-        const renderDashboard = (data) => {
-            // Clear existing table data
-            dataTableBody.innerHTML = '';
-            if (!data || data.length === 0) {
-                dataTableBody.innerHTML = '<tr><td colspan="2" class="text-center py-4">ไม่มีข้อมูล</td></tr>';
-                return;
-            }
-
-            // Sort data by date from newest to oldest for table display
-            data.sort((a, b) => {
-                const dateA = new Date(a['DATE']);
-                const dateB = new Date(b['DATE']);
-                return dateB - dateA;
-            });
-
-            data.forEach(row => {
-                const date = row['DATE']; // Assuming column name is 'DATE'
-                const usdt = row['USDT']; // Assuming column name is 'USDT'
-
-                // Add to table
-                const tr = document.createElement('tr');
-                tr.className = 'border-b border-gray-200 hover:bg-gray-50';
-                tr.innerHTML = `
-                    <td class="py-2 px-4 md:py-3 md:px-6 text-left whitespace-nowrap">${formatDate(date)}</td>
-                    <td class="py-2 px-4 md:py-3 md:px-6 text-left">${usdt !== undefined ? Math.round(usdt).toLocaleString('th-TH', { maximumFractionDigits: 0 }) : '-'}</td>
-                `; // Rounded and no decimals for table
-
-                dataTableBody.appendChild(tr);
-            });
-        };
-
-        // Function to populate the month filter dropdown
-        const populateMonthFilter = (data) => {
-            const months = new Set();
-            data.forEach(row => {
-                if (row['DATE']) {
-                    const date = new Date(row['DATE']);
-                    // Attempt to parse as ISO 8601 (YYYY-MM-DD) if it's a string
-                    if (isNaN(date.getTime())) {
-                        const parts = row['DATE'].split('-');
-                        if (parts.length === 3) {
-                            const parsedDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                            if (!isNaN(parsedDate.getTime())) {
-                                months.add(`${parsedDate.getFullYear()}-${parsedDate.getMonth() + 1}`);
-                            }
-                        }
-                    } else {
-                        months.add(`${date.getFullYear()}-${date.getMonth() + 1}`);
-                    }
-                }
-            });
-
-            // Clear previous options except "All"
-            monthFilterSelect.innerHTML = '<option value="all">ทั้งหมด</option>';
-
-            const sortedMonths = Array.from(months).sort((a, b) => {
-                const [yearA, monthA] = a.split('-').map(Number);
-                const [yearB, monthB] = b.split('-').map(Number);
-                if (yearA !== yearB) return yearA - yearB;
-                return monthA - monthB;
-            });
-
-            sortedMonths.forEach(monthKey => {
-                const [year, month] = monthKey.split('-').map(Number);
-                const dateForMonthName = new Date(year, month - 1, 1);
-                // Ensure the month name displays the Buddhist year here too
-                const monthName = dateForMonthName.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' });
-                const option = document.createElement('option');
-                option.value = monthKey;
-                option.textContent = monthName;
-                monthFilterSelect.appendChild(option);
-            });
-        };
-
-        // Function to apply the filter
-        const applyFilter = () => {
-            const selectedMonth = monthFilterSelect.value;
-            let filteredData = allDashboardData;
-
-            if (selectedMonth !== 'all') {
-                filteredData = allDashboardData.filter(row => {
-                    if (row['DATE']) {
-                        const date = new Date(row['DATE']);
-                        // Re-attempt parsing for consistency
-                        if (isNaN(date.getTime())) {
-                            const parts = row['DATE'].split('-');
-                            if (parts.length === 3) {
-                                const parsedDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                                if (!isNaN(parsedDate.getTime())) {
-                                    return `${parsedDate.getFullYear()}-${parsedDate.getMonth() + 1}` === selectedMonth;
-                                }
-                            }
-                            return false; // Invalid date format
-                        }
-                        return `${date.getFullYear()}-${date.getMonth() + 1}` === selectedMonth;
-                    }
-                    return false;
-                });
-            }
-            renderDashboard(filteredData);
-        };
-
-        // Function to fetch data for the input fields based on selected date
-        const loadInputDataForDate = () => {
-            const selectedDate = dateSelect.value;
-            if (!selectedDate) {
-                // Clear fields if no date is selected
-                celoInput.value = '';
-                enjInput.value = '';
-                wldInput.value = '';
-                runeInput.value = '';
-                return;
-            }
-
-            // Create a unique callback name for JSONP
-            const callbackName = 'jsonpInputCallback_' + Date.now();
-            window[callbackName] = (response) => {
-                if (response && response.data) {
-                    const data = response.data;
-                    // Populate fields. If data is null, ensure fields are cleared.
-                    celoInput.value = data.celo !== null ? (data.celo * 100).toFixed(2) : ''; // Convert back to percentage for display
-                    enjInput.value = data.enj !== null ? (data.enj * 100).toFixed(2) : '';
-                    wldInput.value = data.wld !== null ? (data.wld * 100).toFixed(2) : '';
-                    runeInput.value = data.rune !== null ? (data.rune * 100).toFixed(2) : '';
-                } else {
-                    // Clear fields if no data or error
-                    celoInput.value = '';
-                    enjInput.value = '';
-                    wldInput.value = '';
-                    runeInput.value = '';
-                }
-                // Clean up the script tag and callback
-                document.body.removeChild(script);
-                delete window[callbackName];
-            };
-
-            const script = document.createElement('script');
-            // Add sheetName and date parameters for Apps Script to handle
-            script.src = `${SCRIPT_URL}?sheetName=Input!&date=${selectedDate}&callback=${callbackName}`;
-            script.onerror = () => {
-                console.error('Failed to load input data for date:', selectedDate);
-                // Clear fields on error
-                celoInput.value = '';
-                enjInput.value = '';
-                wldInput.value = '';
-                runeInput.value = '';
-                document.body.removeChild(script);
-                delete window[callbackName];
-            };
-            document.body.appendChild(script);
-        };
-
-        // Function to fetch specific cells from CACULATE!
-        const fetchSpecificCaculateData = () => {
-            // Rows specified by the user
-            // F183, H183; F214, H214; F245, H245; F275, H275; F306, H306; F336, H336; F366, H366
-            const targetRows = [183, 214, 245, 275, 306, 336, 366];
-            const columnsToFetch = 'F,H,I'; // Demodate (F), DemoUSDT (H), ถอนUSDT (I)
-
-            // Clear previous results and show loading
-            specificCaculateDataBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">กำลังโหลดข้อมูล...</td></tr>';
-
-            const callbackName = 'jsonpSpecificCaculateCallback_' + Date.now();
-            window[callbackName] = (response) => {
-                if (response && response.data) {
-                    specificCaculateDataBody.innerHTML = ''; // Clear loading
-                    response.data.forEach(item => {
-                        const tr = document.createElement('tr');
-                        tr.className = 'border-b border-gray-200 hover:bg-gray-50';
-                        const formattedDate = item.date ? formatDate(item.date) : '-'; // Use existing formatDate
-                        // Ensure values are formatted as a whole number
-                        const formattedDemoUSDT = item.demoUSDT !== null && item.demoUSDT !== undefined ? Math.round(item.demoUSDT).toLocaleString('th-TH', { maximumFractionDigits: 0 }) : '-';
-                        const formattedWithdrawUSDT = item.withdrawUSDT !== null && item.withdrawUSDT !== undefined ? Math.round(item.withdrawUSDT).toLocaleString('th-TH', { maximumFractionDigits: 0 }) : '-';
-
-                        tr.innerHTML = `
-                            <td class="py-2 px-4 text-left">${item.row}</td>
-                            <td class="py-2 px-4 text-left whitespace-nowrap">${formattedDate}</td>
-                            <td class="py-2 px-4 text-left">${formattedDemoUSDT}</td>
-                            <td class="py-2 px-4 text-left">${formattedWithdrawUSDT}</td>
-                        `;
-                        specificCaculateDataBody.appendChild(tr);
-                    });
-                } else {
-                    specificCaculateDataBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">ไม่สามารถโหลดข้อมูลเฉพาะได้</td></tr>';
-                    console.error('Error fetching specific CACULATE! data:', response.error || 'Unknown error');
-                }
-                document.body.removeChild(script);
-                delete window[callbackName];
-            };
-
-            const script = document.createElement('script');
-            // Pass parameters for new action, rows, and specific columns
-            script.src = `${SCRIPT_URL}?action=fetchSpecificCaculateData&rows=${targetRows.join(',')}&columns=${columnsToFetch}&callback=${callbackName}`;
-            script.onerror = () => {
-                specificCaculateDataBody.innerHTML = '<tr><td colspan="4" class="text-center py-4">ข้อผิดพลาดในการเชื่อมต่อ</td></tr>';
-                console.error('Failed to connect for specific CACULATE! data.');
-                document.body.removeChild(script);
-                delete window[callbackName];
-            };
-            document.body.appendChild(script);
-        };
-
-
-        // Function to fetch data from Google Sheet using JSONP (for Dashboard)
-        const fetchData = () => {
+        // --- DATA HANDLING ---
+        function fetchData() {
             Swal.fire({
-                title: 'กำลังอัพเดทข้อมูล...',
-                html: 'กรุณารอสักครู่',
+                title: 'กำลังโหลดข้อมูล...',
+                text: 'กรุณารอสักครู่',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
                 }
             });
 
-            const callbackName = 'jsonpCallback_' + Date.now();
-            window[callbackName] = (response) => {
-                if (response && response.data) {
-                    allDashboardData = response.data; // Store raw data
-                    localStorage.setItem('dashboardData', JSON.stringify(allDashboardData));
-                    populateMonthFilter(allDashboardData); // Populate filter with new data
-                    applyFilter(); // Apply filter to render initial view (default to "all")
-                    // Also fetch specific CACULATE! data
-                    fetchSpecificCaculateData(); 
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'อัพเดทข้อมูลสำเร็จ!',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'เกิดข้อผิดพลาด!',
-                        text: 'ไม่สามารถโหลดข้อมูลได้',
-                    });
-                }
-                document.body.removeChild(script);
-                delete window[callbackName];
-            };
-
+            const url = `${GAS_URL}?action=getAllData&callback=handleData`;
             const script = document.createElement('script');
-            script.src = `${SCRIPT_URL}?callback=${callbackName}`;
-            script.onerror = () => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'เกิดข้อผิดพลาด!',
-                    text: 'ไม่สามารถเชื่อมต่อกับ Google Sheet ได้',
-                });
-                document.body.removeChild(script);
-                delete window[callbackName];
-            };
+            script.src = url;
             document.body.appendChild(script);
-        };
-
-        // Populate date dropdown for the entire year
-        const populateDateDropdown = () => {
-            const today = new Date();
-            const currentYear = today.getFullYear();
-            dateSelect.innerHTML = ''; // Clear previous options
-
-            for (let month = 0; month < 12; month++) {
-                const daysInMonth = new Date(currentYear, month + 1, 0).getDate();
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const date = new Date(currentYear, month, day);
-                    const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD
-                    const displayDate = formatDate(formattedDate); // Use the custom formatDate for display in dropdown (Buddhist year)
-                    const option = document.createElement('option');
-                    option.value = formattedDate;
-                    option.textContent = displayDate;
-                    dateSelect.appendChild(option);
-                }
+            
+            script.onload = () => document.body.removeChild(script);
+            script.onerror = () => {
+                 Swal.fire('เกิดข้อผิดพลาด!', 'ไม่สามารถโหลดข้อมูลจาก Google Sheets ได้', 'error');
             }
-            // Set default selected date to today for input page
-            dateSelect.value = today.toISOString().split('T')[0];
-            loadInputDataForDate(); // Load data for the default selected date
-        };
+        }
+        
+        window.handleData = (response) => {
+            if (response && response.mainData && response.forecastData) {
+                masterData = response.mainData;
+                populateFilters(masterData);
+                updateForecastDisplay(response.forecastData);
+                applyFilters(); 
+                Swal.close();
+            } else {
+                 Swal.fire('เกิดข้อผิดพลาด!', 'ได้รับข้อมูลในรูปแบบที่ไม่ถูกต้อง', 'error');
+            }
+        }
 
-        // Event Listeners
-        updateDataBtn.addEventListener('click', fetchData);
-        applyFilterBtn.addEventListener('click', applyFilter); // Add event listener for the new filter button
-        dateSelect.addEventListener('change', loadInputDataForDate); // Listen for date changes on input page
+        function populateFilters(data) {
+            const years = [...new Set(data.map(item => item.Year))].sort((a,b) => b-a);
+            const coins = [...new Set(data.map(item => item.เหรียญ))];
 
-        inputDataPageBtn.addEventListener('click', () => {
-            dashboardPage.classList.add('hidden');
-            inputPage.classList.remove('hidden');
-            populateDateDropdown(); // Populate dropdown and load data for current date when navigating to input page
-        });
+            yearFilter.innerHTML = years.map(year => `<option value="${year}">${year}</option>`).join('');
+            
+            coinFilter.innerHTML = '<option value="all">เหรียญทั้งหมด</option>' + 
+                                coins.map(coin => `<option value="${coin}">${coin}</option>`).join('');
+        }
+        
+        function applyFilters() {
+            let filteredData = [...masterData];
 
-        backToDashboardBtn.addEventListener('click', () => {
-            inputPage.classList.add('hidden');
-            dashboardPage.classList.remove('hidden');
-            applyFilter(); // Re-apply filter when returning to dashboard to ensure correct display
-        });
+            const selectedYear = yearFilter.value;
+            const selectedCoin = coinFilter.value;
+            const selectedMonth = monthFilter.value;
 
-        saveDataBtn.addEventListener('click', async () => {
-            const selectedDate = dateSelect.value;
-            const celo = celoInput.value;
-            const enj = enjInput.value;
-            const wld = wldInput.value;
-            const rune = runeInput.value;
+            if (selectedYear && selectedYear !== 'all') {
+                filteredData = filteredData.filter(d => d.Year == selectedYear);
+            }
+            if (selectedCoin && selectedCoin !== 'all') {
+                filteredData = filteredData.filter(d => d.เหรียญ === selectedCoin);
+            }
+            if (selectedMonth && selectedMonth !== 'all') {
+                filteredData = filteredData.filter(d => d.Month == selectedMonth);
+            }
+            
+            updateStats(filteredData);
+            renderChart(filteredData);
+        }
 
-            if (!selectedDate || !celo || !enj || !wld || !rune) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'กรุณากรอกข้อมูลให้ครบถ้วน!',
-                    text: 'ตรวจสอบให้แน่ใจว่าได้กรอกทุกช่องแล้ว',
-                });
+        function updateStats(data) {
+            const totalTrades = data.length;
+            if (totalTrades === 0) {
+                winRateDisplay.textContent = '0%';
+                loseRateDisplay.textContent = '0%';
+                totalTradesDisplay.textContent = '0';
                 return;
             }
 
+            const wins = data.filter(d => d.สถานะ === 'Win').length;
+            const losses = data.filter(d => d.สถานะ === 'Lose').length;
+
+            const winRate = (wins / totalTrades) * 100;
+            const loseRate = (losses / totalTrades) * 100;
+
+            winRateDisplay.textContent = `${winRate.toFixed(1)}%`;
+            loseRateDisplay.textContent = `${loseRate.toFixed(1)}%`;
+            totalTradesDisplay.textContent = totalTrades;
+        }
+
+        // --- FORECASTING LOGIC ---
+        
+        function updateForecastDisplay(forecastData) {
+            const dailyAvg = parseFloat(forecastData.dailyAvg) || 0;
+            dailyAvgDisplay.textContent = `${dailyAvg.toFixed(2)}%`;
+
+            monthlyAvgInput.value = parseFloat(forecastData.monthlyAvg) || '';
+            
+            daysInput.value = parseInt(forecastData.days) || '';
+
+            const finalResult = parseFloat(forecastData.finalResult) || 0;
+            forecastResultDisplay.textContent = new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(finalResult);
+        }
+
+        function saveForecastData() {
+            const monthlyAvg = monthlyAvgInput.value;
+            const days = daysInput.value;
+
             Swal.fire({
-                title: 'กำลังบันทึกข้อมูล...',
-                html: 'กรุณารอสักครู่',
+                title: 'กำลังบันทึกและคำนวณ...',
                 allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
+                didOpen: () => { Swal.showLoading(); }
             });
 
-            try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    cache: 'no-cache',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
+            const params = new URLSearchParams({
+                action: 'saveForecastInputs',
+                monthlyAvg: monthlyAvg,
+                days: days,
+                callback: 'handleSaveForecastResponse'
+            });
+
+            const url = `${GAS_URL}?${params.toString()}`;
+            const script = document.createElement('script');
+            script.src = url;
+            document.body.appendChild(script);
+            script.onload = () => document.body.removeChild(script);
+            script.onerror = () => { Swal.fire('เกิดข้อผิดพลาด!', 'ไม่สามารถบันทึกข้อมูลได้', 'error'); }
+        }
+
+        window.handleSaveForecastResponse = (response) => {
+            if (response.status === 'success') {
+                fetchData(); 
+            } else {
+                 Swal.fire('เกิดข้อผิดพลาด!', response.message, 'error');
+            }
+        }
+
+
+        // --- CHART RENDERING ---
+        function renderChart(data) {
+            const chartType = chartTypeFilter.value;
+
+            if (tradingChart) {
+                tradingChart.destroy();
+            }
+            
+            const ctx = chartCanvas.getContext('2d');
+            let chartConfig;
+
+            if (chartType === 'bar' || chartType === 'line') {
+                const monthlyData = {};
+                const monthNames = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+                monthNames.forEach(m => { monthlyData[m] = { sum: 0, count: 0 }; });
+
+                data.forEach(item => {
+                    const monthIndex = item.Month - 1;
+                    if (monthIndex >= 0 && monthIndex < 12) {
+                        const monthName = monthNames[monthIndex];
+                        monthlyData[monthName].sum += parseFloat(item.THB) || 0;
+                        monthlyData[monthName].count++;
+                    }
+                });
+
+                const labels = Object.keys(monthlyData);
+                const chartData = labels.map(month => {
+                    const { sum, count } = monthlyData[month];
+                    return count > 0 ? sum / count : 0;
+                });
+                
+                chartConfig = {
+                    type: chartType,
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: `ค่าเฉลี่ยกำไร/ขาดทุน (THB) ปี ${yearFilter.value}`,
+                            data: chartData,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: chartType === 'line' ? 'rgba(75, 192, 192, 0.2)' : chartData.map(v => v >= 0 ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)'),
+                            borderWidth: chartType === 'line' ? 2 : 1,
+                            borderRadius: chartType === 'bar' ? 5 : 0,
+                            fill: chartType === 'line',
+                            tension: 0.1
+                        }]
                     },
-                    body: new URLSearchParams({
-                        date: selectedDate,
-                        // คูณด้วย 0.01 ก่อนนำไปกรอกข้อมูล
-                        celo: parseFloat(celo) * 0.01,
-                        enj: parseFloat(enj) * 0.01,
-                        wld: parseFloat(wld) * 0.01,
-                        rune: parseFloat(rune) * 0.01
-                    }).toString()
-                });
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: false, ticks: { color: '#374151' } }, x: { ticks: { color: '#374151' } } },
+                        plugins: {
+                            legend: { labels: { color: '#374151' } },
+                            tooltip: { callbacks: { label: (context) => `${context.dataset.label || ''}: ${new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(context.parsed.y)}` } }
+                        }
+                    }
+                };
 
-                const result = await response.json();
+            } else if (chartType === 'doughnut') {
+                const wins = data.filter(d => d.สถานะ === 'Win').length;
+                const losses = data.filter(d => d.สถานะ !== 'Win').length;
 
-                if (result.status === 'success') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'บันทึกข้อมูลสำเร็จ!',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-
-                    // After saving, re-fetch data to update dashboard immediately and also input fields
-                    fetchData(); // This will refresh dashboard table and specific CACULATE! table
-                    loadInputDataForDate(); // This will refresh input fields for the currently selected date
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'เกิดข้อผิดพลาด!',
-                        text: result.message || 'ไม่สามารถบันทึกข้อมูลได้',
-                    });
-                }
-            } catch (error) {
-                console.error('Error saving data:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'เกิดข้อผิดพลาด!',
-                    text: 'ไม่สามารถเชื่อมต่อกับ Google Sheet ได้: ' + error.message,
-                });
+                chartConfig = {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['ชนะ (Win)', 'แพ้ (Lose)'],
+                        datasets: [{
+                            data: [wins, losses],
+                            backgroundColor: ['rgba(75, 192, 192, 0.7)', 'rgba(255, 99, 132, 0.7)'],
+                            borderColor: ['#FFFFFF'],
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'top', labels: { color: '#374151' } },
+                            title: { display: true, text: 'สัดส่วนการเทรด ชนะ/แพ้', color: '#374151', font: { size: 16 } }
+                        }
+                    }
+                };
             }
+            
+            if (chartConfig) {
+                 tradingChart = new Chart(ctx, chartConfig);
+            }
+        }
+        
+        // --- FORM SUBMISSION ---
+        function saveTrade(e) {
+            e.preventDefault();
+            const tradeDate = document.getElementById('trade-date').value;
+            const tradeCoin = document.getElementById('trade-coin').value;
+            const tradeResultRaw = document.getElementById('trade-result').value;
+
+            if (!tradeDate || !tradeCoin || !tradeResultRaw) {
+                Swal.fire('ข้อมูลไม่ครบ!', 'กรุณากรอกข้อมูลให้ครบทุกช่อง', 'warning');
+                return;
+            }
+            // User enters "15.5" for 15.5%, but sheet requires 0.155
+            const tradeResult = parseFloat(tradeResultRaw) / 100;
+
+            Swal.fire({ title: 'กำลังบันทึกข้อมูล...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+            const params = new URLSearchParams({
+                action: 'addData',
+                date: tradeDate,
+                coin: tradeCoin,
+                result: tradeResult.toFixed(4), // Save as decimal
+                callback: 'handleSaveTradeResponse'
+            });
+
+            const url = `${GAS_URL}?${params.toString()}`;
+            const script = document.createElement('script');
+            script.src = url;
+            document.body.appendChild(script);
+            script.onload = () => document.body.removeChild(script);
+            script.onerror = () => { Swal.fire('เกิดข้อผิดพลาด!', 'ไม่สามารถบันทึกข้อมูลได้', 'error'); }
+        }
+        
+        window.handleSaveTradeResponse = (response) => {
+            if(response.status === 'success') {
+                Swal.fire('บันทึกสำเร็จ!', response.message, 'success');
+                addTradeForm.reset();
+                // Refetch all data to update everything
+                fetchData();
+                showDashboard();
+            } else {
+                Swal.fire('เกิดข้อผิดพลาด!', response.message, 'error');
+            }
+        }
+
+
+        // --- EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            createFloatingEmojis();
+            fetchData();
         });
 
-        // Initial load logic is handled in window.onload
-        document.addEventListener('DOMContentLoaded', () => {
-            populateDateDropdown(); // Call populateDateDropdown to set default date for input page dropdown
-        });
+        addTradeBtn.addEventListener('click', showAddTradeForm);
+        backToDashboardBtn.addEventListener('click', showDashboard);
+        addTradeForm.addEventListener('submit', saveTrade);
+        saveForecastBtn.addEventListener('click', saveForecastData);
+
+        yearFilter.addEventListener('change', applyFilters);
+        coinFilter.addEventListener('change', applyFilters);
+        monthFilter.addEventListener('change', applyFilters);
+        chartTypeFilter.addEventListener('change', applyFilters);
+
     </script>
 </body>
 </html>
