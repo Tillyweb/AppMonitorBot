@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ฟ<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Three.js CDN for 3D rendering -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Chart.js CDN (Removed from here as it's no longer used for charts) -->
 
     <style>
         body {
@@ -180,7 +181,7 @@
         const backToDashboardBtn = document.getElementById('back-to-dashboard-btn');
         const saveDataBtn = document.getElementById('save-data-btn');
         const dataTableBody = document.getElementById('data-table-body');
-        // Removed usdtChartCanvas and Chart.js related elements
+        // usdtChartCanvas and Chart.js related elements are permanently removed
 
         const dateSelect = document.getElementById('date-select');
         const celoInput = document.getElementById('celo-input');
@@ -192,6 +193,7 @@
         const monthFilterSelect = document.getElementById('month-filter');
         const applyFilterBtn = document.getElementById('apply-filter-btn');
 
+        // Removed usdtChart as there's no chart anymore
         let allDashboardData = []; // Global variable to store raw data for filtering
 
         // --- Three.js setup for 3D Emojis ---
@@ -320,7 +322,7 @@
             return date.toLocaleDateString('th-TH');
         };
 
-        // Function to render data to table
+        // Function to render data to table (Chart.js removed from here)
         const renderDashboard = (data) => {
             // Clear existing table data
             dataTableBody.innerHTML = '';
@@ -329,11 +331,11 @@
                 return;
             }
 
-            // Sort data by date from newest to oldest
+            // Sort data by date from newest to oldest for table display
             data.sort((a, b) => {
                 const dateA = new Date(a['DATE']);
                 const dateB = new Date(b['DATE']);
-                return dateB - dateA; // Changed sorting order here
+                return dateB - dateA;
             });
 
             data.forEach(row => {
@@ -345,8 +347,8 @@
                 tr.className = 'border-b border-gray-200 hover:bg-gray-50';
                 tr.innerHTML = `
                     <td class="py-2 px-4 md:py-3 md:px-6 text-left whitespace-nowrap">${formatDate(date)}</td>
-                    <td class="py-2 px-4 md:py-3 md:px-6 text-left">${usdt !== undefined ? usdt.toLocaleString() : '-'}</td>
-                `;
+                    <td class="py-2 px-4 md:py-3 md:px-6 text-left">${usdt !== undefined ? Math.round(usdt).toLocaleString('th-TH', { maximumFractionDigits: 0 }) : '-'}</td>
+                `; // Rounded and no decimals
                 dataTableBody.appendChild(tr);
             });
         };
@@ -617,11 +619,6 @@
                         showConfirmButton: false,
                         timer: 1500
                     });
-                    // Optionally clear inputs after successful save
-                    // celoInput.value = ''; // Don't clear if user might want to continue editing for the same date
-                    // enjInput.value = '';
-                    // wldInput.value = '';
-                    // runeInput.value = '';
 
                     // After saving, re-fetch data to update dashboard immediately and also input fields
                     fetchData(); // This will refresh dashboard table
@@ -643,17 +640,9 @@
             }
         });
 
-        // Initial load for dashboard data (moved to window.onload)
+        // Initial load for dashboard data (called in window.onload)
         // document.addEventListener('DOMContentLoaded', () => {
-        //     const cachedData = localStorage.getItem('dashboardData');
-        //     if (cachedData) {
-        //         allDashboardData = JSON.parse(cachedData); // Load raw data from cache
-        //         populateMonthFilter(allDashboardData); // Populate filter from cached data
-        //         applyFilter(); // Apply filter to render initial view (default to "all")
-        //         console.log('ข้อมูลจาก Local Storage โหลดแล้ว');
-        //     } else {
-        //         fetchData(); // Fetch if no cached data
-        //     }
+        //     // Initial data fetch logic is now handled in window.onload after Three.js init
         // });
     </script>
 </body>
