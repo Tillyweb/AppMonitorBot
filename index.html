@@ -1,4 +1,4 @@
-ฟ<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="th">
 <head>
     <meta charset="UTF-8">
@@ -10,9 +10,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Inter font from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Three.js CDN for 3D rendering -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Chart.js CDN (Removed from here as it's no longer used for charts) -->
 
     <style>
         body {
@@ -24,8 +21,7 @@
             align-items: center;
             justify-content: flex-start; /* Align content to the top */
             padding: 1rem; /* Consistent padding around the main content */
-            position: relative; /* For stacking with 3D canvas */
-            z-index: 1; /* Ensure body content is above 3D canvas */
+            overflow: hidden; /* Hide scrollbar caused by floating emojis */
         }
         .soft-blue { background-color: #E0F2F7; } /* A light blue */
         .soft-green { background-color: #E6F4EA; } /* A light green */
@@ -67,22 +63,81 @@
             z-index: 1;
         }
 
-        /* 3D Canvas Styles */
-        #three-canvas {
+        /* Floating Emojis Animation */
+        @keyframes floatUp {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(360deg) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .emoji-container {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -2; /* Position behind everything else */
-            display: block;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden; /* Keep emojis within their container */
+            z-index: -1;
         }
+
+        .emoji {
+            position: absolute;
+            font-size: 3rem; /* Larger emojis */
+            animation: floatUp linear infinite;
+            opacity: 0; /* Start hidden */
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        /* Specific emoji animation delays and positions */
+        .emoji:nth-child(1) { animation-delay: 0s; left: 10%; animation-duration: 25s; }
+        .emoji:nth-child(2) { animation-delay: 2s; left: 20%; animation-duration: 20s; }
+        .emoji:nth-child(3) { animation-delay: 4s; left: 30%; animation-duration: 22s; }
+        .emoji:nth-child(4) { animation-delay: 6s; left: 40%; animation-duration: 28s; }
+        .emoji:nth-child(5) { animation-delay: 8s; left: 50%; animation-duration: 23s; }
+        .emoji:nth-child(6) { animation-delay: 10s; left: 60%; animation-duration: 26s; }
+        .emoji:nth-child(7) { animation-delay: 12s; left: 70%; animation-duration: 21s; }
+        .emoji:nth-child(8) { animation-delay: 14s; left: 80%; animation-duration: 24s; }
+        .emoji:nth-child(9) { animation-delay: 16s; left: 90%; animation-duration: 27s; }
+        .emoji:nth-child(10) { animation-delay: 18s; left: 5%; animation-duration: 19s; }
+        .emoji:nth-child(11) { animation-delay: 20s; left: 15%; animation-duration: 29s; }
+        .emoji:nth-child(12) { animation-delay: 22s; left: 25%; animation-duration: 20s; }
+        .emoji:nth-child(13) { animation-delay: 24s; left: 35%; animation-duration: 25s; }
+        .emoji:nth-child(14) { animation-delay: 26s; left: 45%; animation-duration: 21s; }
+        .emoji:nth-child(15) { animation-delay: 28s; left: 55%; animation-duration: 28s; }
+        .emoji:nth-child(16) { animation-delay: 30s; left: 65%; animation-duration: 23s; }
+        .emoji:nth-child(17) { animation-delay: 32s; left: 75%; animation-duration: 26s; }
+        .emoji:nth-child(18) { animation-delay: 34s; left: 85%; animation-duration: 20s; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-start p-4">
 
-    <!-- Three.js Canvas for 3D Emojis -->
-    <canvas id="three-canvas"></canvas>
+    <!-- Emoji Container -->
+    <div class="emoji-container">
+        <div class="emoji" style="color: #64B5F6;">📈</div>
+        <div class="emoji" style="color: #81C784;">💰</div>
+        <div class="emoji" style="color: #FFD54F;">📊</div>
+        <div class="emoji" style="color: #4DB6AC;">🚀</div>
+        <div class="emoji" style="color: #7986CB;">💸</div>
+        <div class="emoji" style="color: #FF8A65;">💡</div>
+        <div class="emoji" style="color: #A1887F;">💎</div>
+        <div class="emoji" style="color: #C5E1A5;">✨</div>
+        <div class="emoji" style="color: #EF9A9A;">💹</div>
+        <div class="emoji" style="color: #B39DDB;">🍀</div>
+        <div class="emoji" style="color: #FFEB3B;">🌟</div>
+        <div class="emoji" style="color: #8BC34A;">🌱</div>
+        <div class="emoji" style="color: #FF6F61;">💖</div>
+        <div class="emoji" style="color: #A7FFEB;">🎉</div>
+        <div class="emoji" style="color: #D1C4E9;">🔔</div>
+        <div class="emoji" style="color: #FFCC80;">📈</div>
+        <div class="emoji" style="color: #8D6E63;">💱</div>
+        <div class="emoji" style="color: #C0CA33;">👑</div>
+    </div>
 
     <div id="dashboard-page" class="soft-blue rounded-xl shadow-lg p-4 md:p-8 w-full max-w-5xl transition-all duration-300">
         <h1 class="text-3xl md:text-4xl font-bold text-center mb-6 md:mb-8 text-gray-800">Dashboard My BOT Trading</h1>
@@ -107,6 +162,8 @@
                 <span>ใช้ตัวกรอง</span>
             </button>
         </div>
+
+        <!-- Search Section for CACULATE! sheet has been removed -->
 
         <!-- Section 1: Data Table (now the primary display) -->
         <div class="bg-white p-4 md:p-6 rounded-lg shadow-md">
@@ -181,8 +238,7 @@
         const backToDashboardBtn = document.getElementById('back-to-dashboard-btn');
         const saveDataBtn = document.getElementById('save-data-btn');
         const dataTableBody = document.getElementById('data-table-body');
-        // usdtChartCanvas and Chart.js related elements are permanently removed
-
+        
         const dateSelect = document.getElementById('date-select');
         const celoInput = document.getElementById('celo-input');
         const enjInput = document.getElementById('enj-input');
@@ -193,136 +249,45 @@
         const monthFilterSelect = document.getElementById('month-filter');
         const applyFilterBtn = document.getElementById('apply-filter-btn');
 
-        // Removed usdtChart as there's no chart anymore
+        // Search related elements removed (searchDateInput, searchCaculateBtn, searchResultDisplay)
+
         let allDashboardData = []; // Global variable to store raw data for filtering
 
-        // --- Three.js setup for 3D Emojis ---
-        let scene, camera, renderer, objects = [];
-        const colors = [0xE0F2F7, 0xE6F4EA, 0xFFFDE7, 0x64B5F6, 0x81C784, 0xFFD54F, 0x4DB6AC, 0x7986CB]; // Soft tones and some brighter ones
 
-        function initThree() {
-            const threeCanvas = document.getElementById('three-canvas');
-            if (!threeCanvas) {
-                console.error("Three.js canvas not found.");
-                return;
-            }
-
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ canvas: threeCanvas, alpha: true, antialias: true }); // alpha: true for transparent background
-            renderer.setSize(window.innerWidth, window.innerHeight);
-
-            // Add some light
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7); // soft white light
-            scene.add(ambientLight);
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-            directionalLight.position.set(0, 1, 1).normalize();
-            scene.add(directionalLight);
-
-            // Create 3D "emojis" (simple geometric shapes)
-            const geometries = [
-                new THREE.SphereGeometry(1, 32, 32),
-                new THREE.BoxGeometry(1.5, 1.5, 1.5),
-                new THREE.TetrahedronGeometry(1.2),
-                new THREE.TorusGeometry(1, 0.4, 16, 100)
-            ];
-
-            for (let i = 0; i < 12; i++) {
-                const geometry = geometries[Math.floor(Math.random() * geometries.length)];
-                const material = new THREE.MeshLambertMaterial({ color: colors[Math.floor(Math.random() * colors.length)] });
-                const object = new THREE.Mesh(geometry, material);
-
-                // Random position within a certain range
-                object.position.x = (Math.random() - 0.5) * 40;
-                object.position.y = (Math.random() - 0.5) * 40;
-                object.position.z = (Math.random() - 0.5) * 20 - 5; // Slightly behind the content
-
-                // Random rotation
-                object.rotation.x = Math.random() * Math.PI;
-                object.rotation.y = Math.random() * Math.PI;
-                object.rotation.z = Math.random() * Math.PI;
-
-                // Random scale
-                const scale = Math.random() * 0.8 + 0.5; // Scale between 0.5 and 1.3
-                object.scale.set(scale, scale, scale);
-
-                object.initialY = object.position.y; // Store initial Y for floating animation
-                object.animationSpeed = (Math.random() * 0.005) + 0.001; // Vary speed
-                object.rotationSpeedX = (Math.random() - 0.5) * 0.005;
-                object.rotationSpeedY = (Math.random() - 0.5) * 0.005;
-
-                scene.add(object);
-                objects.push(object);
-            }
-
-            camera.position.z = 5; // Adjust camera to see objects
-        }
-
-        function animateThree() {
-            requestAnimationFrame(animateThree);
-
-            objects.forEach(object => {
-                // Float up (Y-axis)
-                object.position.y += object.animationSpeed;
-                // If object goes too high, reset to bottom
-                if (object.position.y > (window.innerHeight / 20) + 10) { // Reset based on screen height
-                    object.position.y = -(window.innerHeight / 20) - 10;
-                    object.position.x = (Math.random() - 0.5) * 40; // Randomize X on reset
-                    object.position.z = (Math.random() - 0.5) * 20 - 5; // Randomize Z on reset
-                }
-
-                // Rotate
-                object.rotation.x += object.rotationSpeedX;
-                object.rotation.y += object.rotationSpeedY;
-            });
-
-            renderer.render(scene, camera);
-        }
-
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        window.addEventListener('resize', onWindowResize);
-        window.onload = function() {
-            initThree();
-            animateThree();
-            // Initial load for dashboard data
-            const cachedData = localStorage.getItem('dashboardData');
-            if (cachedData) {
-                allDashboardData = JSON.parse(cachedData);
-                populateMonthFilter(allDashboardData);
-                applyFilter();
-                console.log('ข้อมูลจาก Local Storage โหลดแล้ว');
-            } else {
-                fetchData();
-            }
-        };
-
-        // --- End Three.js setup ---
-
-
-        // Function to format date for display (DD/MM/YYYY)
+        // Function to format date for display (DD/MM/BBBB - Buddhist year)
         const formatDate = (dateString) => {
             if (!dateString) return '';
-            const date = new Date(dateString);
-            if (isNaN(date.getTime())) { // Check for invalid date
-                // Attempt to parse as ISO 8601 (YYYY-MM-DD) if it's a string
-                const parts = dateString.split('-');
+            let date = new Date(dateString);
+
+            // Attempt to parse as YYYY-MM-DD if initial parsing failed or yielded invalid date
+            if (isNaN(date.getTime())) {
+                const parts = String(dateString).split('-'); // Ensure dateString is treated as string
                 if (parts.length === 3) {
-                    const parsedDate = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                    if (!isNaN(parsedDate.getTime())) {
-                        return parsedDate.toLocaleDateString('th-TH');
-                    }
+                    // new Date(year, monthIndex, day)
+                    date = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
                 }
-                return dateString; // Return original if parsing failed
             }
-            return date.toLocaleDateString('th-TH');
+
+            if (isNaN(date.getTime())) { // If still invalid after retry
+                return dateString; // Return original string if parsing failed
+            }
+
+            // Get Gregorian year
+            const gregorianYear = date.getFullYear();
+            // Calculate Buddhist year
+            const buddhistYear = gregorianYear + 543; // Add 543 for Thai Buddhist calendar
+
+            // Get day and month, pad with leading zero if single digit
+            const day = date.getDate();
+            const month = date.getMonth() + 1; // Month is 0-indexed, so add 1
+            const formattedMonth = month < 10 ? '0' + month : month;
+            const formattedDay = day < 10 ? '0' + day : day;
+
+            // Construct the date string manually as DD/MM/BBBB (Buddhist year)
+            return `${formattedDay}/${formattedMonth}/${buddhistYear}`;
         };
 
-        // Function to render data to table (Chart.js removed from here)
+        // Function to render data to table
         const renderDashboard = (data) => {
             // Clear existing table data
             dataTableBody.innerHTML = '';
@@ -348,7 +313,8 @@
                 tr.innerHTML = `
                     <td class="py-2 px-4 md:py-3 md:px-6 text-left whitespace-nowrap">${formatDate(date)}</td>
                     <td class="py-2 px-4 md:py-3 md:px-6 text-left">${usdt !== undefined ? Math.round(usdt).toLocaleString('th-TH', { maximumFractionDigits: 0 }) : '-'}</td>
-                `; // Rounded and no decimals
+                `; // Rounded and no decimals for table
+
                 dataTableBody.appendChild(tr);
             });
         };
@@ -359,7 +325,7 @@
             data.forEach(row => {
                 if (row['DATE']) {
                     const date = new Date(row['DATE']);
-                    // Attempt to parse as ISO 8601 (YYYY-MM-DD) if it's a string
+                    // Attempt to parse as YYYY-MM-DD if it's a string
                     if (isNaN(date.getTime())) {
                         const parts = row['DATE'].split('-');
                         if (parts.length === 3) {
@@ -387,6 +353,7 @@
             sortedMonths.forEach(monthKey => {
                 const [year, month] = monthKey.split('-').map(Number);
                 const dateForMonthName = new Date(year, month - 1, 1);
+                // Ensure the month name displays the Buddhist year here too
                 const monthName = dateForMonthName.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' });
                 const option = document.createElement('option');
                 option.value = monthKey;
@@ -523,6 +490,8 @@
             document.body.appendChild(script);
         };
 
+        // Removed searchCaculateData function
+
         // Populate date dropdown for the entire year
         const populateDateDropdown = () => {
             const today = new Date();
@@ -534,26 +503,25 @@
                 for (let day = 1; day <= daysInMonth; day++) {
                     const date = new Date(currentYear, month, day);
                     const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD
-                    const displayDate = date.toLocaleDateString('th-TH', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
+                    const displayDate = formatDate(formattedDate); // Use the custom formatDate for display in dropdown (Buddhist year)
                     const option = document.createElement('option');
                     option.value = formattedDate;
                     option.textContent = displayDate;
                     dateSelect.appendChild(option);
                 }
             }
-            // Set default selected date to today
+            // Set default selected date to today for input page
             dateSelect.value = today.toISOString().split('T')[0];
             loadInputDataForDate(); // Load data for the default selected date
+
+            // searchDateInput has been removed, so no need to set its value
         };
 
         // Event Listeners
         updateDataBtn.addEventListener('click', fetchData);
         applyFilterBtn.addEventListener('click', applyFilter); // Add event listener for the new filter button
-        dateSelect.addEventListener('change', loadInputDataForDate); // Listen for date changes
+        dateSelect.addEventListener('change', loadInputDataForDate); // Listen for date changes on input page
+        // searchCaculateBtn.addEventListener('click', searchCaculateData); // This event listener is removed
 
         inputDataPageBtn.addEventListener('click', () => {
             dashboardPage.classList.add('hidden');
@@ -640,10 +608,11 @@
             }
         });
 
-        // Initial load for dashboard data (called in window.onload)
-        // document.addEventListener('DOMContentLoaded', () => {
-        //     // Initial data fetch logic is now handled in window.onload after Three.js init
-        // });
+        // Initial load logic is now handled in window.onload
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial data fetch logic is now handled in window.onload.
+            populateDateDropdown(); // Call populateDateDropdown here to set default date for input page dropdown
+        });
     </script>
 </body>
 </html>
