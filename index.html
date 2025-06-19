@@ -70,15 +70,12 @@
             @apply flex items-center justify-center gap-2; /* Ensure icon and text are aligned */
         }
         .btn-primary {
-             /* Darker Grey for primary actions */
             @apply btn bg-slate-600 text-white hover:bg-slate-700 focus:ring-slate-500;
         }
         .btn-secondary {
-            /* Lighter Grey for secondary actions */
             @apply btn bg-slate-300 text-slate-800 hover:bg-slate-400 focus:ring-slate-300;
         }
         .btn-blue {
-             /* Changed to match primary for consistency */
             @apply btn bg-slate-600 text-white hover:bg-slate-700 focus:ring-slate-500;
         }
 
@@ -107,136 +104,64 @@
             <main class="card p-4 sm:p-6">
                 <!-- Filters -->
                 <div class="flex flex-wrap gap-4 mb-6 items-end">
-                    <div class="flex-auto min-w-[120px]">
-                        <label for="year-filter" class="block text-sm font-medium text-gray-700 mb-1">ปี</label>
-                        <select id="year-filter"></select>
-                    </div>
-                    <div class="flex-auto min-w-[120px]">
-                        <label for="coin-filter" class="block text-sm font-medium text-gray-700 mb-1">เหรียญ</label>
-                        <select id="coin-filter">
-                            <option value="all">ทั้งหมด</option>
-                        </select>
-                    </div>
-                    <div class="flex-auto min-w-[120px]">
-                        <label for="month-filter" class="block text-sm font-medium text-gray-700 mb-1">เดือน</label>
-                        <select id="month-filter">
-                            <option value="all">เดือนทั้งหมด</option>
-                            <option value="1">มกราคม</option>
-                            <option value="2">กุมภาพันธ์</option>
-                            <option value="3">มีนาคม</option>
-                            <option value="4">เมษายน</option>
-                            <option value="5">พฤษภาคม</option>
-                            <option value="6">มิถุนายน</option>
-                            <option value="7">กรกฎาคม</option>
-                            <option value="8">สิงหาคม</option>
-                            <option value="9">กันยายน</option>
-                            <option value="10">ตุลาคม</option>
-                            <option value="11">พฤศจิกายน</option>
-                            <option value="12">ธันวาคม</option>
-                        </select>
-                    </div>
-                    <div class="flex-auto min-w-[150px]">
-                        <label for="chart-type-filter" class="block text-sm font-medium text-gray-700 mb-1">รูปแบบกราฟ</label>
-                        <select id="chart-type-filter">
-                            <option value="bar">กราฟแท่ง</option>
-                            <option value="line">กราฟเส้น</option>
-                            <option value="doughnut">กราฟวงแหวน (Win/Lose)</option>
-                        </select>
-                    </div>
-                    <div class="flex-shrink-0 w-full sm:w-auto mt-4 sm:mt-0">
-                        <!-- MODIFIED: Added Emoji -->
-                        <button id="add-trade-btn" class="btn-primary w-full">
-                            ➕<span>เพิ่มข้อมูล</span>
-                        </button>
-                    </div>
+                    <div class="flex-auto min-w-[120px]"><label for="year-filter" class="block text-sm font-medium text-gray-700 mb-1">ปี</label><select id="year-filter"></select></div>
+                    <div class="flex-auto min-w-[120px]"><label for="coin-filter" class="block text-sm font-medium text-gray-700 mb-1">เหรียญ</label><select id="coin-filter"><option value="all">ทั้งหมด</option></select></div>
+                    <div class="flex-auto min-w-[120px]"><label for="month-filter" class="block text-sm font-medium text-gray-700 mb-1">เดือน</label><select id="month-filter"><option value="all">เดือนทั้งหมด</option><option value="1">มกราคม</option><option value="2">กุมภาพันธ์</option><option value="3">มีนาคม</option><option value="4">เมษายน</option><option value="5">พฤษภาคม</option><option value="6">มิถุนายน</option><option value="7">กรกฎาคม</option><option value="8">สิงหาคม</option><option value="9">กันยายน</option><option value="10">ตุลาคม</option><option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option></select></div>
+                    <div class="flex-auto min-w-[150px]"><label for="chart-type-filter" class="block text-sm font-medium text-gray-700 mb-1">รูปแบบกราฟ</label><select id="chart-type-filter"><option value="bar">กราฟแท่ง</option><option value="line">กราฟเส้น</option><option value="doughnut">กราฟวงแหวน (Win/Lose)</option></select></div>
+                    <div class="flex-shrink-0 w-full sm:w-auto mt-4 sm:mt-0"><button id="add-trade-btn" class="btn-primary w-full">➕<span>เพิ่มข้อมูล</span></button></div>
                 </div>
 
                 <!-- Statistics Display -->
                 <div id="stats-display" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 border-t border-gray-200 py-4">
-                    <div class="stat-card">
-                        <h4 class="text-sm font-medium text-gray-500">อัตราการชนะ (Win Rate)</h4>
-                        <p id="win-rate-display" class="text-2xl font-bold text-green-500">0%</p>
-                    </div>
-                    <div class="stat-card">
-                        <h4 class="text-sm font-medium text-gray-500">อัตราการแพ้ (Lose Rate)</h4>
-                        <p id="lose-rate-display" class="text-2xl font-bold text-red-500">0%</p>
-                    </div>
-                     <div class="stat-card">
-                        <h4 class="text-sm font-medium text-gray-500">จำนวนเทรดทั้งหมด</h4>
-                        <p id="total-trades-display" class="text-2xl font-bold text-gray-700">0</p>
-                    </div>
+                    <div class="stat-card"><h4 class="text-sm font-medium text-gray-500">อัตราการชนะ (Win Rate)</h4><p id="win-rate-display" class="text-2xl font-bold text-green-500">0%</p></div>
+                    <div class="stat-card"><h4 class="text-sm font-medium text-gray-500">อัตราการแพ้ (Lose Rate)</h4><p id="lose-rate-display" class="text-2xl font-bold text-red-500">0%</p></div>
+                    <div class="stat-card"><h4 class="text-sm font-medium text-gray-500">จำนวนเทรดทั้งหมด</h4><p id="total-trades-display" class="text-2xl font-bold text-gray-700">0</p></div>
                 </div>
 
                 <!-- Forecasting Section -->
                 <div id="forecasting-section" class="border-t border-gray-200 pt-4 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">คำนวณแนวโน้มอนาคต (Forecasting)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
-                        <div class="stat-card md:col-span-1">
-                            <h4 class="text-sm font-medium text-gray-500">เงินในประเป๋า(THB)</h4>
-                            <input type="number" id="monthly-avg-input" placeholder="0.00" class="text-center text-xl font-bold !p-0 border-0 bg-transparent w-full">
-                        </div>
-                        <div class="stat-card md:col-span-1">
-                            <h4 class="text-sm font-medium text-gray-500">จำนวนวัน</h4>
-                            <input type="number" id="days-input" min="1" placeholder="30" class="text-center text-xl font-bold !p-0 border-0 bg-transparent w-full">
-                        </div>
-                        <div class="stat-card md:col-span-2">
-                             <h4 class="text-sm font-medium text-gray-500">ผลเทรดเฉลี่ยต่อวัน (%)</h4>
-                             <p id="daily-avg-display" class="text-2xl font-bold text-blue-500">0.00%</p>
-                        </div>
-                        <div class="stat-card bg-purple-100 md:col-span-2">
-                             <h4 class="text-sm font-medium text-purple-800">ผลลัพธ์ที่คาดการณ์ (THB)</h4>
-                             <p id="forecast-result-display" class="text-2xl font-bold text-purple-600">0.00</p>
-                        </div>
+                        <div class="stat-card md:col-span-1"><h4 class="text-sm font-medium text-gray-500">เงินในประเป๋า(THB)</h4><input type="number" id="monthly-avg-input" placeholder="0.00" class="text-center text-xl font-bold !p-0 border-0 bg-transparent w-full"></div>
+                        <div class="stat-card md:col-span-1"><h4 class="text-sm font-medium text-gray-500">จำนวนวัน</h4><input type="number" id="days-input" min="1" placeholder="30" class="text-center text-xl font-bold !p-0 border-0 bg-transparent w-full"></div>
+                        <div class="stat-card md:col-span-2"><h4 class="text-sm font-medium text-gray-500">ผลเทรดเฉลี่ยต่อวัน (%)</h4><p id="daily-avg-display" class="text-2xl font-bold text-blue-500">0.00%</p></div>
+                        <div class="stat-card bg-purple-100 md:col-span-2"><h4 class="text-sm font-medium text-purple-800">ผลลัพธ์ที่คาดการณ์ (THB)</h4><p id="forecast-result-display" class="text-2xl font-bold text-purple-600">0.00</p></div>
                     </div>
-                    <div class="mt-4 flex justify-end">
-                        <!-- MODIFIED: Added Emoji -->
-                        <button id="save-forecast-btn" class="btn-blue">
-                            🧮<span>บันทึกและคำนวณแนวโน้ม</span>
-                        </button>
+                    <div class="mt-4 flex justify-end"><button id="save-forecast-btn" class="btn-blue">🧮<span>บันทึกและคำนวณแนวโน้ม</span></button></div>
+                    
+                    <!-- Forecast Table -->
+                    <div id="forecast-table-container" class="mt-4 overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500">
+                            <!-- MODIFIED: Table Headers -->
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">วันที่คาดการณ์</th>
+                                    <th scope="col" class="px-6 py-3 text-right">ยอดเงินคาดว่าจะถอนได้ (THB)</th>
+                                    <th scope="col" class="px-6 py-3 text-right">พอร์ตรวม (THB)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="forecast-table-body">
+                                <!-- Rows will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
                 <!-- Chart -->
-                <div class="w-full h-80 bg-gray-50/50 rounded-lg p-4">
-                    <canvas id="tradingChart"></canvas>
-                </div>
+                <div class="w-full h-80 bg-gray-50/50 rounded-lg p-4"><canvas id="tradingChart"></canvas></div>
             </main>
         </div>
 
         <!-- Add Trade View -->
         <div id="add-trade-view" class="w-full max-w-md hidden">
-             <header class="text-center mb-8">
-                <h1 class="text-4xl font-bold">
-                     <span class="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">บันทึกการเทรด</span>
-                </h1>
-            </header>
+             <header class="text-center mb-8"><h1 class="text-4xl font-bold"><span class="bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-blue-500">บันทึกการเทรด</span></h1></header>
             <form id="add-trade-form" class="card p-8 space-y-6">
-                <div>
-                    <label for="trade-date" class="block text-sm font-medium text-gray-700 mb-1">วันที่</label>
-                    <input type="date" id="trade-date" required>
-                </div>
-                <div>
-                    <label for="trade-coin" class="block text-sm font-medium text-gray-700 mb-1">เหรียญ</label>
-                    <select id="trade-coin" required>
-                        <option value="CELO">CELO</option>
-                        <option value="ENJ">ENJ</option>
-                        <option value="WLD">WLD</option>
-                        <option value="RUNE">RUNE</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="trade-result" class="block text-sm font-medium text-gray-700 mb-1">ผลการเทรด (%)</label>
-                    <input type="number" id="trade-result" step="0.01" placeholder="เช่น 15.5 (ไม่ต้องใส่ %)" required>
-                </div>
-
-                <div class="flex gap-4 pt-4">
-                    <!-- MODIFIED: Added Emojis -->
-                    <button type="button" id="back-to-dashboard-btn" class="btn-secondary w-full">⬅️<span>กลับหน้าหลัก</span></button>
-                    <button type="submit" class="btn-primary w-full">💾<span>บันทึกข้อมูล</span></button>
-                </div>
+                <div><label for="trade-date" class="block text-sm font-medium text-gray-700 mb-1">วันที่</label><input type="date" id="trade-date" required></div>
+                <div><label for="trade-coin" class="block text-sm font-medium text-gray-700 mb-1">เหรียญ</label><select id="trade-coin" required><option value="CELO">CELO</option><option value="ENJ">ENJ</option><option value="WLD">WLD</option><option value="RUNE">RUNE</option></select></div>
+                <div><label for="trade-result" class="block text-sm font-medium text-gray-700 mb-1">ผลการเทรด (%)</label><input type="number" id="trade-result" step="0.01" placeholder="เช่น 15.5 (ไม่ต้องใส่ %)" required></div>
+                <div class="flex gap-4 pt-4"><button type="button" id="back-to-dashboard-btn" class="btn-secondary w-full">⬅️<span>กลับหน้าหลัก</span></button><button type="submit" class="btn-primary w-full">💾<span>บันทึกข้อมูล</span></button></div>
             </form>
         </div>
-
     </div>
 
     <script>
@@ -268,7 +193,7 @@
         const dailyAvgDisplay = document.getElementById('daily-avg-display');
         const forecastResultDisplay = document.getElementById('forecast-result-display');
         const saveForecastBtn = document.getElementById('save-forecast-btn');
-
+        const forecastTableBody = document.getElementById('forecast-table-body');
 
         // --- STATE ---
         let tradingChart;
@@ -278,7 +203,7 @@
         function createFloatingEmojis() {
             const background = document.getElementById('emoji-background');
             if (background.children.length > 0) return;
-            const emojiChars = ['📈', '📉', '💰', '🤖', '💸', '🚀', '₿', '🔥'];
+            const emojiChars = ['📈', '📉', '💰', '�', '💸', '🚀', '₿', '🔥'];
             const numEmojis = 30;
 
             for (let i = 0; i < numEmojis; i++) {
@@ -331,6 +256,7 @@
                 masterData = response.mainData;
                 populateFilters(masterData);
                 updateForecastDisplay(response.forecastData);
+                renderForecastTable(response.forecastTable);
                 applyFilters(); 
                 Swal.close();
             } else {
@@ -392,16 +318,49 @@
         // --- FORECASTING LOGIC ---
         
         function updateForecastDisplay(forecastData) {
-            const dailyAvg = parseFloat(forecastData.dailyAvg) || 0;
-            dailyAvgDisplay.textContent = `${dailyAvg.toFixed(2)}%`;
-
+            dailyAvgDisplay.textContent = `${(forecastData.dailyAvg || 0).toFixed(2)}%`;
             monthlyAvgInput.value = parseFloat(forecastData.monthlyAvg) || '';
-            
             daysInput.value = parseInt(forecastData.days) || '';
-
             const finalResult = parseFloat(forecastData.finalResult) || 0;
             forecastResultDisplay.textContent = new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(finalResult);
         }
+
+        // MODIFIED: Renders the forecast table with new column mapping
+        function renderForecastTable(tableData) {
+            forecastTableBody.innerHTML = ''; // Clear existing rows
+            if (!tableData || tableData.length === 0) {
+                 forecastTableBody.innerHTML = `<tr><td colspan="3" class="px-6 py-4 text-center">ไม่มีข้อมูลการคาดการณ์</td></tr>`;
+                return;
+            }
+            // GAS sends data as [M, N, O] for each row
+            tableData.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = 'bg-white border-b hover:bg-gray-50';
+                
+                // 1. วันที่คาดการณ์ (from Column O -> row[2])
+                const dateCell = document.createElement('td');
+                dateCell.className = 'px-6 py-4';
+                dateCell.textContent = row[2] ? new Date(row[2]).toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
+                
+                // 2. ยอดเงินคาดว่าจะถอนได้ (THB) (from Column N -> row[1])
+                const withdrawableCell = document.createElement('td');
+                withdrawableCell.className = 'px-6 py-4 text-right';
+                const withdrawableValue = parseFloat(row[1]) || 0;
+                withdrawableCell.textContent = new Intl.NumberFormat('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(withdrawableValue);
+                withdrawableCell.className += withdrawableValue >= 0 ? ' text-green-600' : ' text-red-600';
+
+                // 3. พอร์ตรวม (THB) (from Column M -> row[0])
+                const totalCell = document.createElement('td');
+                totalCell.className = 'px-6 py-4 text-right font-medium';
+                totalCell.textContent = new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(row[0] || 0);
+
+                tr.appendChild(dateCell);
+                tr.appendChild(withdrawableCell);
+                tr.appendChild(totalCell);
+                forecastTableBody.appendChild(tr);
+            });
+        }
+
 
         function saveForecastData() {
             const monthlyAvg = monthlyAvgInput.value;
@@ -430,7 +389,9 @@
 
         window.handleSaveForecastResponse = (response) => {
             if (response.status === 'success') {
-                fetchData(); 
+                updateForecastDisplay(response.forecastData);
+                renderForecastTable(response.forecastTable);
+                Swal.close();
             } else {
                  Swal.fire('เกิดข้อผิดพลาด!', response.message, 'error');
             }
@@ -536,7 +497,6 @@
                 Swal.fire('ข้อมูลไม่ครบ!', 'กรุณากรอกข้อมูลให้ครบทุกช่อง', 'warning');
                 return;
             }
-            // User enters "15.5" for 15.5%, but sheet requires 0.155
             const tradeResult = parseFloat(tradeResultRaw) / 100;
 
             Swal.fire({ title: 'กำลังบันทึกข้อมูล...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
@@ -545,7 +505,7 @@
                 action: 'addData',
                 date: tradeDate,
                 coin: tradeCoin,
-                result: tradeResult.toFixed(4), // Save as decimal
+                result: tradeResult.toFixed(4), 
                 callback: 'handleSaveTradeResponse'
             });
 
@@ -561,7 +521,6 @@
             if(response.status === 'success') {
                 Swal.fire('บันทึกสำเร็จ!', response.message, 'success');
                 addTradeForm.reset();
-                // Refetch all data to update everything
                 fetchData();
                 showDashboard();
             } else {
@@ -589,3 +548,4 @@
     </script>
 </body>
 </html>
+�
