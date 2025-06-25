@@ -122,7 +122,11 @@
                 <div id="forecasting-section" class="border-t border-gray-200 pt-4 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">คำนวณแนวโน้มอนาคต (Forecasting)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
-                        <div class="stat-card md:col-span-1"><h4 class="text-sm font-medium text-gray-500">เงินในประเป๋า(THB)</h4><input type="number" id="monthly-avg-input" placeholder="0.00" class="text-center text-xl font-bold !p-0 border-0 bg-transparent w-full"></div>
+                        <!-- MODIFIED: Changed from input to <p> tag -->
+                        <div class="stat-card md:col-span-1">
+                            <h4 class="text-sm font-medium text-gray-500">เงินในประเป๋า(THB)</h4>
+                            <p id="wallet-balance-display" class="text-xl font-bold text-gray-800">0.00</p>
+                        </div>
                         <div class="stat-card md:col-span-1"><h4 class="text-sm font-medium text-gray-500">จำนวนวัน</h4><input type="number" id="days-input" min="1" placeholder="30" class="text-center text-xl font-bold !p-0 border-0 bg-transparent w-full"></div>
                         <div class="stat-card md:col-span-2"><h4 class="text-sm font-medium text-gray-500">ผลเทรดเฉลี่ยต่อวัน (%)</h4><p id="daily-avg-display" class="text-2xl font-bold text-blue-500">0.00%</p></div>
                         <div class="stat-card bg-purple-100 md:col-span-2"><h4 class="text-sm font-medium text-purple-800">ผลลัพธ์ที่คาดการณ์ (THB)</h4><p id="forecast-result-display" class="text-2xl font-bold text-purple-600">0.00</p></div>
@@ -132,7 +136,6 @@
                     <!-- Forecast Table -->
                     <div id="forecast-table-container" class="mt-4 overflow-x-auto">
                         <table class="w-full text-sm text-left text-gray-500">
-                            <!-- MODIFIED: Table Headers -->
                             <thead class="text-xs text-gray-700 uppercase bg-gray-100">
                                 <tr>
                                     <th scope="col" class="px-6 py-3">วันที่คาดการณ์</th>
@@ -188,7 +191,7 @@
         const totalTradesDisplay = document.getElementById('total-trades-display');
 
         // Forecasting elements
-        const monthlyAvgInput = document.getElementById('monthly-avg-input');
+        const walletBalanceDisplay = document.getElementById('wallet-balance-display'); // MODIFIED
         const daysInput = document.getElementById('days-input');
         const dailyAvgDisplay = document.getElementById('daily-avg-display');
         const forecastResultDisplay = document.getElementById('forecast-result-display');
@@ -203,7 +206,7 @@
         function createFloatingEmojis() {
             const background = document.getElementById('emoji-background');
             if (background.children.length > 0) return;
-            const emojiChars = ['📈', '📉', '💰', '�', '💸', '🚀', '₿', '🔥'];
+            const emojiChars = ['📈', '📉', '💰', '🤖', '💸', '🚀', '₿', '🔥'];
             const numEmojis = 30;
 
             for (let i = 0; i < numEmojis; i++) {
@@ -317,39 +320,36 @@
 
         // --- FORECASTING LOGIC ---
         
+        // MODIFIED: updateForecastDisplay now handles walletBalance
         function updateForecastDisplay(forecastData) {
             dailyAvgDisplay.textContent = `${(forecastData.dailyAvg || 0).toFixed(2)}%`;
-            monthlyAvgInput.value = parseFloat(forecastData.monthlyAvg) || '';
+            const walletBalance = parseFloat(forecastData.walletBalance) || 0;
+            walletBalanceDisplay.textContent = new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(walletBalance);
             daysInput.value = parseInt(forecastData.days) || '';
             const finalResult = parseFloat(forecastData.finalResult) || 0;
             forecastResultDisplay.textContent = new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(finalResult);
         }
 
-        // MODIFIED: Renders the forecast table with new column mapping
         function renderForecastTable(tableData) {
-            forecastTableBody.innerHTML = ''; // Clear existing rows
+            forecastTableBody.innerHTML = ''; 
             if (!tableData || tableData.length === 0) {
                  forecastTableBody.innerHTML = `<tr><td colspan="3" class="px-6 py-4 text-center">ไม่มีข้อมูลการคาดการณ์</td></tr>`;
                 return;
             }
-            // GAS sends data as [M, N, O] for each row
             tableData.forEach(row => {
                 const tr = document.createElement('tr');
                 tr.className = 'bg-white border-b hover:bg-gray-50';
                 
-                // 1. วันที่คาดการณ์ (from Column O -> row[2])
                 const dateCell = document.createElement('td');
                 dateCell.className = 'px-6 py-4';
                 dateCell.textContent = row[2] ? new Date(row[2]).toLocaleDateString('th-TH', { day: '2-digit', month: 'short', year: 'numeric' }) : '-';
                 
-                // 2. ยอดเงินคาดว่าจะถอนได้ (THB) (from Column N -> row[1])
                 const withdrawableCell = document.createElement('td');
                 withdrawableCell.className = 'px-6 py-4 text-right';
                 const withdrawableValue = parseFloat(row[1]) || 0;
                 withdrawableCell.textContent = new Intl.NumberFormat('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(withdrawableValue);
                 withdrawableCell.className += withdrawableValue >= 0 ? ' text-green-600' : ' text-red-600';
 
-                // 3. พอร์ตรวม (THB) (from Column M -> row[0])
                 const totalCell = document.createElement('td');
                 totalCell.className = 'px-6 py-4 text-right font-medium';
                 totalCell.textContent = new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(row[0] || 0);
@@ -361,9 +361,8 @@
             });
         }
 
-
+        // MODIFIED: saveForecastData no longer sends wallet balance
         function saveForecastData() {
-            const monthlyAvg = monthlyAvgInput.value;
             const days = daysInput.value;
 
             Swal.fire({
@@ -374,7 +373,6 @@
 
             const params = new URLSearchParams({
                 action: 'saveForecastInputs',
-                monthlyAvg: monthlyAvg,
                 days: days,
                 callback: 'handleSaveForecastResponse'
             });
@@ -548,4 +546,3 @@
     </script>
 </body>
 </html>
-�
