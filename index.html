@@ -111,22 +111,25 @@
                     <div class="flex-shrink-0 w-full sm:w-auto mt-4 sm:mt-0"><button id="add-trade-btn" class="btn-primary w-full">➕<span>เพิ่มข้อมูล</span></button></div>
                 </div>
 
-                <!-- Statistics Display -->
-                <div id="stats-display" class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 border-t border-gray-200 py-4">
+                <!-- MODIFIED: Statistics Display grid changed to 5 columns -->
+                <div id="stats-display" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6 border-t border-gray-200 py-4">
                     <div class="stat-card"><h4 class="text-sm font-medium text-gray-500">อัตราการชนะ (Win Rate)</h4><p id="win-rate-display" class="text-2xl font-bold text-green-500">0%</p></div>
                     <div class="stat-card"><h4 class="text-sm font-medium text-gray-500">อัตราการแพ้ (Lose Rate)</h4><p id="lose-rate-display" class="text-2xl font-bold text-red-500">0%</p></div>
                     <div class="stat-card"><h4 class="text-sm font-medium text-gray-500">จำนวนเทรดทั้งหมด</h4><p id="total-trades-display" class="text-2xl font-bold text-gray-700">0</p></div>
+                    <div class="stat-card bg-blue-100"><h4 class="text-sm font-medium text-blue-800">STEP วันนี้</h4><p id="step-display" class="text-2xl font-bold text-blue-600">-</p></div>
+                    <!-- NEW: Calculate STEP Button -->
+                    <div class="stat-card !p-0">
+                        <button id="calculate-step-btn" onclick="window.open('https://tillyweb.github.io/appCalculatorordersizebot/', '_blank')" class="btn-secondary w-full h-full">
+                            🧮<span>คำนวน STEP</span>
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Forecasting Section -->
                 <div id="forecasting-section" class="border-t border-gray-200 pt-4 mb-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-3">คำนวณแนวโน้มอนาคต (Forecasting)</h3>
                     <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
-                        <!-- MODIFIED: Changed from input to <p> tag -->
-                        <div class="stat-card md:col-span-1">
-                            <h4 class="text-sm font-medium text-gray-500">เงินในประเป๋า(THB)</h4>
-                            <p id="wallet-balance-display" class="text-xl font-bold text-gray-800">0.00</p>
-                        </div>
+                        <div class="stat-card md:col-span-1"><h4 class="text-sm font-medium text-gray-500">เงินในประเป๋า(THB)</h4><p id="wallet-balance-display" class="text-xl font-bold text-gray-800">0.00</p></div>
                         <div class="stat-card md:col-span-1"><h4 class="text-sm font-medium text-gray-500">จำนวนวัน</h4><input type="number" id="days-input" min="1" placeholder="30" class="text-center text-xl font-bold !p-0 border-0 bg-transparent w-full"></div>
                         <div class="stat-card md:col-span-2"><h4 class="text-sm font-medium text-gray-500">ผลเทรดเฉลี่ยต่อวัน (%)</h4><p id="daily-avg-display" class="text-2xl font-bold text-blue-500">0.00%</p></div>
                         <div class="stat-card bg-purple-100 md:col-span-2"><h4 class="text-sm font-medium text-purple-800">ผลลัพธ์ที่คาดการณ์ (THB)</h4><p id="forecast-result-display" class="text-2xl font-bold text-purple-600">0.00</p></div>
@@ -136,16 +139,8 @@
                     <!-- Forecast Table -->
                     <div id="forecast-table-container" class="mt-4 overflow-x-auto">
                         <table class="w-full text-sm text-left text-gray-500">
-                            <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3">วันที่คาดการณ์</th>
-                                    <th scope="col" class="px-6 py-3 text-right">ยอดเงินคาดว่าจะถอนได้ (THB)</th>
-                                    <th scope="col" class="px-6 py-3 text-right">พอร์ตรวม (THB)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="forecast-table-body">
-                                <!-- Rows will be inserted here by JavaScript -->
-                            </tbody>
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-100"><tr><th scope="col" class="px-6 py-3">วันที่คาดการณ์</th><th scope="col" class="px-6 py-3 text-right">ยอดเงินคาดว่าจะถอนได้ (THB)</th><th scope="col" class="px-6 py-3 text-right">พอร์ตรวม (THB)</th></tr></thead>
+                            <tbody id="forecast-table-body"><!-- Rows will be inserted here by JavaScript --></tbody>
                         </table>
                     </div>
                 </div>
@@ -189,9 +184,10 @@
         const winRateDisplay = document.getElementById('win-rate-display');
         const loseRateDisplay = document.getElementById('lose-rate-display');
         const totalTradesDisplay = document.getElementById('total-trades-display');
+        const stepDisplay = document.getElementById('step-display');
 
         // Forecasting elements
-        const walletBalanceDisplay = document.getElementById('wallet-balance-display'); // MODIFIED
+        const walletBalanceDisplay = document.getElementById('wallet-balance-display');
         const daysInput = document.getElementById('days-input');
         const dailyAvgDisplay = document.getElementById('daily-avg-display');
         const forecastResultDisplay = document.getElementById('forecast-result-display');
@@ -259,6 +255,7 @@
                 masterData = response.mainData;
                 populateFilters(masterData);
                 updateForecastDisplay(response.forecastData);
+                updateStepDisplay(response.stepValue);
                 renderForecastTable(response.forecastTable);
                 applyFilters(); 
                 Swal.close();
@@ -318,9 +315,8 @@
             totalTradesDisplay.textContent = totalTrades;
         }
 
-        // --- FORECASTING LOGIC ---
+        // --- FORECASTING AND STEP LOGIC ---
         
-        // MODIFIED: updateForecastDisplay now handles walletBalance
         function updateForecastDisplay(forecastData) {
             dailyAvgDisplay.textContent = `${(forecastData.dailyAvg || 0).toFixed(2)}%`;
             const walletBalance = parseFloat(forecastData.walletBalance) || 0;
@@ -328,6 +324,16 @@
             daysInput.value = parseInt(forecastData.days) || '';
             const finalResult = parseFloat(forecastData.finalResult) || 0;
             forecastResultDisplay.textContent = new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' }).format(finalResult);
+        }
+
+        function updateStepDisplay(stepValue) {
+            if (stepValue == 2) {
+                stepDisplay.textContent = 'STEP2';
+            } else if (stepValue == 1) {
+                stepDisplay.textContent = 'STEP1';
+            } else {
+                stepDisplay.textContent = '-';
+            }
         }
 
         function renderForecastTable(tableData) {
@@ -361,7 +367,7 @@
             });
         }
 
-        // MODIFIED: saveForecastData no longer sends wallet balance
+
         function saveForecastData() {
             const days = daysInput.value;
 
